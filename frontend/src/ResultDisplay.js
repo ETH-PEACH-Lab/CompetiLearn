@@ -63,13 +63,6 @@ const ResultDisplay = ({ results, activeButton, isLoading }) => {
     const handlePreviewClick = async (title, cellIndex, index, initialLoad = false) => {
         console.log('Fetching preview for:', title, cellIndex, index, initialLoad);
 
-        if (!initialLoad && expandedIndexes.has(index)) {
-            const newExpandedIndexes = new Set(expandedIndexes);
-            newExpandedIndexes.delete(index);
-            setExpandedIndexes(newExpandedIndexes);
-            return;
-        }
-
         const localStorageKey = `${title}-${cellIndex}`;
         const cachedData = localStorage.getItem(localStorageKey);
 
@@ -204,33 +197,26 @@ const ResultDisplay = ({ results, activeButton, isLoading }) => {
                                                             <p>Votes: {additionalInfo[`${resultIndex}-${docIndex}`]?.votes || 'Loading...'}</p>
                                                         </div>
                                                     </div>
-                                                    <div className="source-document-content">
-                                                        <button onClick={() => handlePreviewClick(doc.metadata.title, doc.metadata.first_cell_index, `${resultIndex}-${docIndex}`)}>
-                                                            {expandedIndexes.has(`${resultIndex}-${docIndex}`) ? 'Hide Preview' : 'Show Preview'}
-                                                        </button>
-                                                        {expandedIndexes.has(`${resultIndex}-${docIndex}`) && (
-                                                            <div
-                                                                className="cell-content clickable-content"
-                                                                onClick={() => handleContentClick(doc.metadata.title)}
-                                                            >
-                                                                {loadingIndexes.has(`${resultIndex}-${docIndex}`) ? (
-                                                                    <div className="loader"></div>
+                                                    <div
+                                                        className="source-document-content clickable-content"
+                                                        onClick={() => handleContentClick(doc.metadata.title)}
+                                                    >
+                                                        {loadingIndexes.has(`${resultIndex}-${docIndex}`) ? (
+                                                            <div className="loader"></div>
+                                                        ) : (
+                                                            cellContents[`${resultIndex}-${docIndex}`]?.map((cell, cellIdx) => (
+                                                                cell.cell_type === 'code' ? (
+                                                                    <div
+                                                                        key={`${resultIndex}-${docIndex}-${cellIdx}`}
+                                                                        style={{ height: calculateEditorHeight(cell.source), border: '1px solid #ddd', marginBottom: '10px' }}
+                                                                        ref={(container) => initializeEditor(container, cell.source, `${resultIndex}-${docIndex}-${cellIdx}`)}
+                                                                    />
                                                                 ) : (
-                                                                    cellContents[`${resultIndex}-${docIndex}`]?.map((cell, cellIdx) => (
-                                                                        cell.cell_type === 'code' ? (
-                                                                            <div
-                                                                                key={`${resultIndex}-${docIndex}-${cellIdx}`}
-                                                                                style={{ height: calculateEditorHeight(cell.source), border: '1px solid #ddd', marginBottom: '10px' }}
-                                                                                ref={(container) => initializeEditor(container, cell.source, `${resultIndex}-${docIndex}-${cellIdx}`)}
-                                                                            />
-                                                                        ) : (
-                                                                            <div key={`${resultIndex}-${docIndex}-${cellIdx}`} className="markdown-cell">
-                                                                                <ReactMarkdown>{cell.source}</ReactMarkdown>
-                                                                            </div>
-                                                                        )
-                                                                    ))
-                                                                )}
-                                                            </div>
+                                                                    <div key={`${resultIndex}-${docIndex}-${cellIdx}`} className="markdown-cell">
+                                                                        <ReactMarkdown>{cell.source}</ReactMarkdown>
+                                                                    </div>
+                                                                )
+                                                            ))
                                                         )}
                                                     </div>
                                                 </li>
