@@ -1,5 +1,5 @@
 import React from 'react';
-import './AdvancedSearchPanel.css';
+import '../styles/AdvancedSearchPanel.css';
 
 const AdvancedSearchPanel = ({ temperature, onTemperatureChange, searchMode, onSearchModeChange }) => {
     const handleSliderChange = (event) => {

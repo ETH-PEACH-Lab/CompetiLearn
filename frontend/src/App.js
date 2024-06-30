@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import './App.css';
-import Header from './Header';
-import SearchBar from './SearchBar';
-import ResultDisplay from './ResultDisplay';
+import './styles/App.css';
+import Header from './components/Header';
+import SearchBar from './components/SearchBar';
+import ResultDisplay from './components/ResultDisplay';
 import axios from 'axios';
-import AdvancedSearchPanel from './AdvancedSearchPanel';
+import AdvancedSearchPanel from './components/AdvancedSearchPanel';
 
 function App() {
     const [results, setResults] = useState([]);

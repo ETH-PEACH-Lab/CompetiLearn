@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import './App.css';
-import Header from './Header';
-import SearchBar from './SearchBar';
-import ResultDisplay from './ResultDisplay';
+import Header from '../components/Header';
+import SearchBar from '../components/SearchBar';
+import ResultDisplay from '../components/ResultDisplay';
 import axios from 'axios';
 
 function App() {
@@ -57,10 +57,8 @@ function App() {
                     GPT-4o
                 </button>
             </div>
+            <SearchBar onSearch={(query) => handleSearch(query, activeButton)} />
             <ResultDisplay result={result} activeButton={activeButton} isLoading={isLoading} /> {/* Pass isLoading state */}
-            <div className="search-bar-container">
-                <SearchBar onSearch={(query) => handleSearch(query, activeButton)} />
-            </div>
         </div>
     );
 }
