@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import RAGSourcePanel from './RAGSourcePanel';
 
-const ResultDisplay = ({ results, activeButton, isLoading }) => {
+const ResultDisplay = ({ results }) => {
     const queryBubbleRefs = useRef([]);
 
     useEffect(() => {
@@ -18,9 +18,6 @@ const ResultDisplay = ({ results, activeButton, isLoading }) => {
 
     return (
         <div className="result-display">
-            {isLoading ? (
-                <div className="loader"></div>
-            ) : (
                 <>
                     {results.map((result, resultIndex) => (
                         <div key={resultIndex}>
@@ -38,6 +35,7 @@ const ResultDisplay = ({ results, activeButton, isLoading }) => {
                                 {result.query}
                             </div>
                             <div className="chat-bubble model-bubble">
+                                {!result.response && <div className="loader"></div>}
                                 <ReactMarkdown>{result.response}</ReactMarkdown>
                                 {result.mode === 'rag_with_link' && result.source_documents && result.source_documents.length > 0 && (
                                     <>
@@ -52,7 +50,6 @@ const ResultDisplay = ({ results, activeButton, isLoading }) => {
                         </div>
                     ))}
                 </>
-            )}
         </div>
     );
 };

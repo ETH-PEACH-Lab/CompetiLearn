@@ -9,7 +9,6 @@ import AdvancedSearchPanel from './components/AdvancedSearchPanel';
 function App() {
     const [results, setResults] = useState([]);
     const [activeButton, setActiveButton] = useState('rag_with_link');
-    const [isLoading, setIsLoading] = useState(false);
     const [isAdvancedSearchOpen, setIsAdvancedSearchOpen] = useState(false);
     const [temperature, setTemperature] = useState(0.7);  // Default temperature
     const [searchMode, setSearchMode] = useState('relevance');  // Default search mode
@@ -26,7 +25,8 @@ function App() {
         console.log('Search query:', query);
         console.log('Query mode:', mode);
 
-        setIsLoading(true);
+        const newResult = {query, response: null, mode, source_documents: null};
+        setResults(prevResults => [...prevResults, newResult]);
 
         axios.post('/search', { query, mode, temperature, search_mode: searchMode }, {
             headers: {
@@ -36,14 +36,11 @@ function App() {
             .then(response => {
                 console.log('Response from server:', response.data);
                 const newResult = { query, response: response.data.result, mode, source_documents: response.data.source_documents || [] };
-                setResults(prevResults => [...prevResults, newResult]);
+                setResults(prevResults => [...prevResults.slice(0, prevResults.length-1), newResult]);
             })
             .catch(error => {
                 console.error('There was an error sending the query:', error);
             })
-            .finally(() => {
-                setIsLoading(false);
-            });
     };
 
     const handleButtonClick = (mode) => {
@@ -92,7 +89,7 @@ function App() {
                     GPT-4o
                 </button>
             </div>
-            <ResultDisplay results={results} activeButton={activeButton} isLoading={isLoading} />
+            <ResultDisplay results={results} />
             <div className="search-bar-container">
                 <button className="new-chat-button" onClick={handleNewChat}>Start a new chat</button>
                 <SearchBar onSearch={(query) => handleSearch(query, activeButton)} />
