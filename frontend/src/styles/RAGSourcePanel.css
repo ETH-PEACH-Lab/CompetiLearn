@@ -1,0 +1,8 @@
+.source-document-panel{
+    text-decoration: none;
+    color: black;
+}
+
+.source-document-panel:hover{
+    background:#aaaaaa ;
+}
