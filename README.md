@@ -10,18 +10,5 @@
 OPENAI_API_KEY=YOUR_API_KEY
 
 ```
-
-5. Run frontend at port `3000`:
-```
-cd frontend
-npm install
-npm run start
-```
-
-4. Run server at port `5001`:
-
-```
-cd server
-pip install -r requirements.txt
-python app.py
-```
+3. docker-compose build
+4. docker-compose up
