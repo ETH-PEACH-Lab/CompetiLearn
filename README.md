@@ -10,5 +10,11 @@
 OPENAI_API_KEY=YOUR_API_KEY
 
 ```
-3. docker-compose build
-4. docker-compose up
+3. Build docker
+```
+docker-compose build
+```
+5. Run docker
+```
+docker-compose up
+```
