@@ -1,0 +1,21 @@
+.advanced-search-panel {
+    padding: 5px;
+    background-color: #f1f1f1;
+    border-radius: 10px;
+    margin-top: 10px;
+    position: sticky;
+    top: 10;
+    z-index: 1000;
+}
+
+
+.slider-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 5px;
+}
+
+.slider-container label {
+    margin-bottom: 1px;
+}
