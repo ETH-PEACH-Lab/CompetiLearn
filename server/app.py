@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_from_directory, render_template
 from flask_cors import CORS
 from flask_caching import Cache
 from query_module import (
@@ -10,22 +10,30 @@ from kaggle_post_retrieve_module import get_kernel_url
 import os
 import nbformat
 from dotenv import load_dotenv
+
 dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
 load_dotenv(dotenv_path)
 
-app = Flask(__name__)
-# Configure CORS to allow requests from localhost:3000
-# CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
+app = Flask(__name__, static_folder='public', template_folder='public')
+# Configure CORS to allow requests from specified origins
 CORS(app, resources={r"/*": {"origins": ["http://localhost:3000", "http://10.6.130.123:3000"]}})
 
 cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 
-# current_dir = os.path.dirname(os.path.abspath(__file__))
-# profile_images_folder = os.path.abspath(os.path.join(current_dir, '../data/profile_images_19988'))
-
-profile_images_folder = '/app/data/profile_images_19988'      # os.path.abspath(os.path.join(current_dir, relative_path))
+profile_images_folder = '/app/data/profile_images_19988'
 print(f"Profile images folder: {profile_images_folder}")
 app.config['PROFILE_IMAGES_FOLDER'] = profile_images_folder
+
+@app.route('/')
+def serve_frontend():
+    return send_from_directory(app.static_folder, 'index.html')
+
+@app.route('/<path:path>')
+def serve_static_files(path):
+    if os.path.exists(os.path.join(app.static_folder, path)):
+        return send_from_directory(app.static_folder, path)
+    else:
+        return send_from_directory(app.static_folder, 'index.html')
 
 @app.route('/static/profile_images_19988/<filename>')
 def serve_profile_image(filename):
@@ -166,7 +174,6 @@ def get_cell_content_endpoint():
     except (TypeError, ValueError) as e:
         return jsonify({'error': f'Invalid cell index: {cell_index_param}'}), 400
 
-    # notebook_path = os.path.abspath(os.path.join(current_dir, f'../data/competition_19988_filter/{notebook_title}'))
     notebook_path = f'/app/data/competition_19988_filter/{notebook_title}'
     print('notebook_path:', notebook_path)
     try:

@@ -3,6 +3,7 @@
 # data
 /data
 /venv
+/tmp
 # dependencies
 /node_modules
 /.pnp
