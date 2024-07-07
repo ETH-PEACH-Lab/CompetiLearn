@@ -4,6 +4,12 @@ import Header from './components/Header';
 import SearchBar from './components/SearchBar';
 import ResultDisplay from './components/ResultDisplay';
 import AdvancedSearchPanel from './components/AdvancedSearchPanel';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faGear } from '@fortawesome/free-solid-svg-icons';
+import { Tooltip } from 'react-tooltip'
+
+
 
 function App() {
     const [results, setResults] = useState([]);
@@ -119,10 +125,18 @@ function App() {
             </div>
             <ResultDisplay results={results} />
             <div className="search-bar-container">
-                <button className="new-chat-button" onClick={handleNewChat}>Start a new chat</button>
+                <button className="secondary-button" onClick={handleNewChat}>
+                    <Tooltip id="my-tooltip-newchat" />
+                    <a data-tooltip-id="my-tooltip-newchat" data-tooltip-content="New Chat">
+                    <FontAwesomeIcon icon={faPlus}/>
+                    </a>
+                </button>
                 <SearchBar onSearch={(query) => handleSearch(query, activeButton)} />
-                <button className="advanced-search-button" onClick={toggleAdvancedSearch}>
-                    Advanced Search
+                <button className="secondary-button" onClick={toggleAdvancedSearch}>
+                <Tooltip id="my-tooltip-advanced" />
+                <a data-tooltip-id="my-tooltip-advanced" data-tooltip-content="Advanced Search Options">
+                <FontAwesomeIcon icon={faGear}/>
+                </a>
                 </button>
             </div>
             {isAdvancedSearchOpen && (

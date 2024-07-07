@@ -1,3 +1,7 @@
+body{
+  /* background-color: rgba(244, 244, 245, 0.5); */
+}
+
 .App {
   text-align: center;
   display: flex;
@@ -5,6 +9,9 @@
   min-height: 100vh;
   position: relative;
   padding-bottom: 80px;
+  color: rgb(9, 9, 11);
+  width: 80%;
+  margin: auto;
 }
 
 .App-logo {
@@ -14,6 +21,22 @@
 
 .button-group {
   margin: 20px 0;
+}
+
+#search-textarea{
+  height: 20px;
+  border-width: 0;
+  overflow-y: hidden;
+  padding: 2rem 0rem;
+  width: 100%;
+  padding: 10px;
+  font-size: 15px;
+  resize: none;
+}
+
+#search-textarea:focus{
+  outline:none;
+  box-shadow: none;
 }
 
 .mode-button {
@@ -65,9 +88,9 @@ button {
 .loader {
   border: 16px solid #f3f3f3;
   border-radius: 50%;
-  border-top: 16px solid #3498db;
-  width: 120px;
-  height: 120px;
+  border-top: 16px solid #7c7c7c;
+  width: 100px;
+  height: 100px;
   animation: spin 2s linear infinite;
   margin: 0 auto;
   margin-top: 20px;
@@ -105,14 +128,14 @@ button {
   cursor: pointer;
 }
 
-.search-bar textarea {
+/* .search-bar textarea {
   width: 100%;
   padding: 10px;
   font-size: 16px;
   resize: vertical;
   border: 1px solid #ccc;
   border-radius: 5px;
-}
+} */
 
 .search-bar input {
   width: 100%;
@@ -120,7 +143,7 @@ button {
   font-size: 16px;
 }
 
-.search-bar button {
+/* .search-bar button {
   padding: 10px 20px;
   font-size: 16px;
   cursor: pointer;
@@ -130,7 +153,7 @@ button {
   color: white;
   margin-left: 10px;
   flex-shrink: 0;
-}
+} */
 
 .App-header {
   background-color: #282c34;
@@ -149,11 +172,6 @@ button {
 
 .result-display {
   text-align: left;
-  margin: 20px auto;
-  width: 80%;
-  border: 1px solid #ccc;
-  padding: 20px;
-  border-radius: 4px;
 }
 
 .result-display h2, .result-display h3 {
@@ -182,8 +200,8 @@ button {
 }
 
 .separator {
-  border: 4px solid black;
-  margin: 80px 0;
+  border: 4px solid rgb(124, 124, 124);
+  margin: 40px 0;
 }
 
 .cell-content {
@@ -205,17 +223,19 @@ button {
 .search-bar-container {
   position: fixed;
   bottom: 0;
-  width: 100%;
+  left: 10%;
+  right:10%;
+  border-radius: 20px 20px 0px 0px;
   background-color: #fff;
-  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
-  padding: 10px;
+  box-shadow: 0 10px 15px -3px rgba(0,0,0,.1),0 4px 6px -4px rgba(0,0,0,.1);
+  border: 1px solid rgb(228, 228, 231);
+  padding: 20px 0px;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.new-chat-button,
-.advanced-search-button {
+/* .advanced-search-button {
   padding: 10px 20px;
   font-size: 16px;
   cursor: pointer;
@@ -224,36 +244,83 @@ button {
   background-color: #007bff;
   color: white;
   flex-shrink: 0;
+} */
+
+.secondary-button {
+  height: 36px;
+  width: 36px;
+  border-radius: 36px;
+  color: rgb(143 143 143);
+  border: 1px solid rgb(228, 228, 231);
+  background-color: white;
+  margin: 0px 10px;
+  display:flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.advanced-search-button:hover {
-  background-color: #218838;
+.primary-button {
+  height: 36px;
+  width: 36px;
+  border-radius: 36px;
+  color: rgb(233, 233, 233);
+  border: 1px solid rgb(228, 228, 231);
+  background-color: rgb(46, 46, 46);
+  margin: 0px 10px;
+  display:flex;
+  align-items: center;
+  justify-content: center;
 }
+
+.primary-button:hover{
+  background-color: rgb(73, 73, 73);
+}
+
+.secondary-button:hover {
+  background-color: rgb(241, 241, 241);
+}
+
+/* .advanced-search-button:hover {
+  background-color: #218838;
+} */
 
 .chat-bubble {
-  max-width: 60%;
-  margin: 10px 0;
-  padding: 15px;
-  border-radius: 15px;
+  width: 100%;
   font-size: 16px;
   font-weight: normal;
+  display:flex;
 }
 
-.user-bubble {
-  align-self: flex-end;
-  background-color: rgba(128, 128, 128, 0.6);
-  color: black;
-  text-align: left;
-  margin-left: auto;
-  max-width: 60%;
-  width: fit-content;
-}
-
-.model-bubble {
-  align-self: flex-start;
+.chat-user {
+  margin-top:20px;
+  width:30px;
+  height: 30px;
+  border: 1px solid rgb(228, 228, 228);
+  text-align: center;
   background-color: white;
-  border: 1px solid #ddd;
-  color: black;
+  border-radius: 5px;
+  display:inline-flex;
+  color: #494949;
+  align-items: center;
+  justify-content: center;
+}
+
+.chat-bot {
+  color: #d5d5d5;
+  background-color: #494949;
+}
+
+
+.chat-content {
+  display: inline-block;
+  width:calc(100% - 2rem);
+  margin-left:1rem;
+  border-bottom: 1px solid rgb(228, 228, 228);
+  padding: 20px 0px;
+}
+
+.chat-content > :first-child{
+  margin-top: 5px;
 }
 
 /* New styles for profile image and source document info */
@@ -291,4 +358,8 @@ button {
 
 .source-document-content button {
   margin-bottom: 10px;
+}
+
+.source-display-container{
+  background-color: #d5d5d5;
 }
