@@ -3,7 +3,6 @@ import './styles/App.css';
 import Header from './components/Header';
 import SearchBar from './components/SearchBar';
 import ResultDisplay from './components/ResultDisplay';
-import axios from 'axios';
 import AdvancedSearchPanel from './components/AdvancedSearchPanel';
 
 function App() {
@@ -25,23 +24,52 @@ function App() {
         console.log('Search query:', query);
         console.log('Query mode:', mode);
 
-        const newResult = {query, response: null, mode, source_documents: null};
+        const newResult = { query, response: '', mode, source_documents: [] };
         setResults(prevResults => [...prevResults, newResult]);
 
-        axios.post('/search', { query, mode, temperature, search_mode: searchMode }, {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-            .then(response => {
-                console.log('Response from server:', response.data);
-                const newResult = { query, response: response.data.result, mode, source_documents: response.data.source_documents || [] };
-                setResults(prevResults => [...prevResults.slice(0, prevResults.length-1), newResult]);
-            })
-            .catch(error => {
-                console.error('There was an error sending the query:', error);
-            })
+        fetchStreamData('/stream', { query, mode, temperature, search_mode: searchMode })
     };
+
+    const fetchStreamData = async (url, data) => {
+
+        const res = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+        });
+
+        if (!res.ok) {
+            console.log("Error in response");
+            return;
+        }
+
+        let streamedMessage = '';
+        const reader = res.body.getReader();
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            let rawResult = new TextDecoder("utf-8").decode(value);
+            let results = rawResult.split('$EOL');
+
+            let newMessages = results.filter(message => message.startsWith('Result: '))
+            newMessages = newMessages.map(message => message.replace('Result: ', ''))
+            streamedMessage += newMessages.join('')
+            const newResult = { query: data.query, response: streamedMessage, mode: data.mode, source_documents: [] };
+            setResults(prevResults => [...prevResults.slice(0, prevResults.length - 1), newResult]);
+
+            let rawSource = results.filter(message => message.startsWith('Source: '))
+            if(rawSource.length > 0){
+                let rawSourceData = rawSource[0].replace('Source: ', '').replace('$EOL', '');
+                let source_documents = JSON.parse(rawSourceData)
+                const newResult = { query: data.query, response: streamedMessage, mode: data.mode, source_documents };
+                setResults(prevResults => [...prevResults.slice(0, prevResults.length - 1), newResult]);
+            }
+        }
+    }
 
     const handleButtonClick = (mode) => {
         setActiveButton(mode);

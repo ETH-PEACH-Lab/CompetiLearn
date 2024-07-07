@@ -82,7 +82,6 @@ const RAGSourcePanel = ({ doc, docIndex }) => {
                 <div key={index}>
                     {cell.cell_type === 'code' ?
                         <div className='code-cell'>
-                            <p>{cell.source}</p>
                             <Editor 
                                 defaultValue={cell.source}
                                 defaultLanguage='python'
