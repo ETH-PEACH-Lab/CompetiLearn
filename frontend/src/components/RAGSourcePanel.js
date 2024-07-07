@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import Editor from '@monaco-editor/react';
-import ReactMarkdown from 'react-markdown';
+import Markdown from 'react-markdown';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
+import { oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism'
 
 import '../styles/RAGSourcePanel.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEye, faThumbsUp } from '@fortawesome/free-solid-svg-icons';
 
 const RAGSourcePanel = ({ doc, docIndex }) => {
     const baseUrl = `http://localhost:5001`;
@@ -35,6 +38,10 @@ const RAGSourcePanel = ({ doc, docIndex }) => {
                 votes: responseVotes,
                 views: responseViews,
                 url: responseURL.url,
+                score: 0.57,
+                comment: 20,
+                title: 'Moa | Feature Selection | Cp_dose | Cp_time',
+                update:'4y ago',
                 profileImage: `${baseUrl}/static/profile_images_19988/${responseProfileImage}`
             }
             setSourceMeta(result)
@@ -58,7 +65,7 @@ const RAGSourcePanel = ({ doc, docIndex }) => {
     }, [doc]);
 
     return <>
-        <div>
+        <div className='source-document-container'>
             <a href={sourceMeta.url} target='_blank' className='source-document-panel'>
                 <div className="source-document-header">
                     <img
@@ -67,39 +74,61 @@ const RAGSourcePanel = ({ doc, docIndex }) => {
                         className="profile-image"
                     />
                     <div className="source-document-info">
-                        <p><strong>Source {docIndex + 1}</strong></p>
-                        <p>Author: {sourceMeta.username}</p>
-                        <p>Views: {sourceMeta.views}</p>
-                        <p>Votes: {sourceMeta.votes}</p>
+                        <p><strong>{sourceMeta.title}</strong></p>
+                        <p className='source-secondary'>Author: {sourceMeta.username} · {sourceMeta.update}</p>
+                        <p className='source-secondary'>Score: {sourceMeta.score} · {sourceMeta.comment} comments</p>
                     </div>
+                    <ul className="source-document-status">
+                        <li> <FontAwesomeIcon icon={faEye} /> {sourceMeta.views}</li>
+                        <li> <FontAwesomeIcon icon={faThumbsUp} /> {sourceMeta.votes}</li>
+                    </ul>
+                </div>
+                <div
+                    className="source-document-content"
+                >
+                    {cellContents.map((cell, index) => (
+                        <div key={index}>
+                            {cell.cell_type === 'code' ?
+                                <div className='code-cell'>
+                                    <div className='code-cell-id'>In [{index + 1}]:</div>
+                                    <div className='code-cell-content'>
+                                        <Markdown
+                                            children={`\`\`\`python 
+${cell.source}
+\`\`\``}
+                                            components={{
+                                                code(props) {
+                                                    const { children, className, node, ...rest } = props
+                                                    const match = /language-(\w+)/.exec(className || '')
+                                                    return match ? (
+                                                        <SyntaxHighlighter
+                                                            {...rest}
+                                                            PreTag="div"
+                                                            children={String(children).replace(/\n$/, '')}
+                                                            language={match[1]}
+                                                            style={oneLight}
+                                                        />
+                                                    ) : (
+                                                        <code {...rest} className={className}>
+                                                            {children}
+                                                        </code>
+                                                    )
+                                                }
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                                : <div className='markdown-cell'>
+                                    <Markdown>{cell.source}</Markdown>
+                                </div>
+                            }
+                        </div>
+                    ))
+                    }
                 </div>
             </a>
         </div>
-        <div
-            className="source-document-content"
-        >
-            {cellContents.map((cell, index) => (
-                <div key={index}>
-                    {cell.cell_type === 'code' ?
-                        <div className='code-cell'>
-                            <Editor 
-                                defaultValue={cell.source}
-                                defaultLanguage='python'
-                                options={{
-                                    readOnly: true,
-                                    minimap: { enabled: false }
-                                }}
-                                height="20vh"
-                            />
-                        </div>
-                        : <div className='markdown-cell'>
-                            <ReactMarkdown>{cell.source}</ReactMarkdown>
-                        </div>
-                    }
-                </div>
-            ))
-            }
-        </div>
+
     </>
 }
 

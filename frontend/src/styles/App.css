@@ -1,5 +1,6 @@
 body{
   /* background-color: rgba(244, 244, 245, 0.5); */
+  line-height: 28px;
 }
 
 .App {
@@ -75,10 +76,6 @@ button {
   font-size: 16px;
   margin-left: 10px;
   cursor: pointer;
-}
-
-.markdown-cell {
-  margin-top: 10px;
 }
 
 .cell-content {
@@ -188,12 +185,19 @@ button {
   padding: 10px 0;
 }
 
-.result-display li:last-child {
+/* .result-display li:last-child {
   border-bottom: none;
+} */
+
+.result-display .code-cell-content > pre {
+  background: rgb(250, 250, 250);
+  padding: 10px;
+  border-radius: 4px;
+  overflow: auto;
 }
 
-.result-display pre {
-  background: #f6f8fa;
+.result-display .chat-content > pre {
+  background: #1e1e1e;
   padding: 10px;
   border-radius: 4px;
   overflow: auto;
@@ -316,7 +320,7 @@ button {
   width:calc(100% - 2rem);
   margin-left:1rem;
   border-bottom: 1px solid rgb(228, 228, 228);
-  padding: 20px 0px;
+  padding: 10px 0px;
 }
 
 .chat-content > :first-child{
@@ -335,31 +339,24 @@ button {
   display: flex;
   align-items: center;
   margin-bottom: 10px;
+  column-gap: 20px;
 }
 
-.profile-image {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  margin: 10px 10px 10px 10px; /* Adjusted margin to keep the image slightly away from the edge */
+.source-secondary {
+  color: rgb(60, 64, 67);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 20px;
 }
 
-.source-document-info {
-  flex-grow: 1;
+p > code {
+  font-weight: bold;
 }
 
-.source-document-info p {
-  margin: 0;
+p > code::before {
+  content: "`";
 }
 
-.source-document-content {
-  margin-top: 10px;
-}
-
-.source-document-content button {
-  margin-bottom: 10px;
-}
-
-.source-display-container{
-  background-color: #d5d5d5;
+p > code::after {
+  content: "`";
 }
