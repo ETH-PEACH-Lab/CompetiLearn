@@ -65,7 +65,7 @@ def extract_notebook_content(path_to_notebook):
     return documents
 
 # Usage example
-# directory = 'F:/Desktop/PHD/RAG_project/RAG_project2/competition_19988_filter'
+# directory = 'F:/Desktop/PHD/RAG_project/RAG_project2/competition_profile_images_10737_filter'
 all_documents = []
 
 for filename in os.listdir(directory):

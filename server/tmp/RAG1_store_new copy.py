@@ -63,7 +63,7 @@ def extract_notebook_content(path_to_notebook):
     return documents
 
 # Usage example
-directory = 'F:/Desktop/PHD/RAG_project/RAG_project2/competition_19988_filter'
+directory = 'F:/Desktop/PHD/RAG_project/RAG_project2/competition_profile_images_10737_filter'
 all_documents = []
 
 for filename in os.listdir(directory):
@@ -81,7 +81,7 @@ store = Chroma.from_documents(
     embeddings, 
     ids=[f"{item.metadata['source']}-{index}" for index, item in enumerate(all_documents)],
     collection_name="kaggle_competition", 
-    persist_directory='F:/Desktop/PHD/RAG_project/RAG_project2/ChromDB/19988_filter',
+    persist_directory='F:/Desktop/PHD/RAG_project/RAG_project2/ChromDB/profile_images_10737_filter',
 )
 store.persist()
 print('store success!')

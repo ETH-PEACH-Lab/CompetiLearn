@@ -2,7 +2,7 @@ import os
 import pandas as pd
 
 # Define the path to the folder containing the .ipynb files and the path to the CSV file
-folder_path = 'F:/Desktop/PHD/RAG_project/RAG_project5/competition_19988_filter'
+folder_path = 'F:/Desktop/PHD/RAG_project/RAG_project5/competition_profile_images_10737_filter'
 csv_file_path = 'F:/Desktop/PHD/RAG_project/RAG_project5/middle_file3.csv'
 
 # Read the CSV file

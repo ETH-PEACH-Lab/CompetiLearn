@@ -4,8 +4,8 @@ import pandas as pd
 
 # Define the paths
 csv_file_path = 'F:\Desktop\PHD\RAG_project\RAG_project2\Kernels.csv'
-source_folder = 'F:\Desktop\PHD\RAG_project\RAG_project2\competition_19988'
-destination_folder = 'F:\Desktop\PHD\RAG_project\RAG_project2\competition_19988_filter'
+source_folder = 'F:\Desktop\PHD\RAG_project\RAG_project2\competition_profile_images_10737'
+destination_folder = 'F:\Desktop\PHD\RAG_project\RAG_project2\competition_profile_images_10737_filter'
 
 # Read the CSV file
 kernels_df = pd.read_csv(csv_file_path)

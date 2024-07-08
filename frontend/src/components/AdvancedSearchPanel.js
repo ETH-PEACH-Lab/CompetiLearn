@@ -25,7 +25,7 @@ const AdvancedSearchPanel = ({ temperature, onTemperatureChange, searchMode, onS
                 />
             </div>
             <div className="mode-container">
-                <label>Order By:</label>
+                <label>Search Mode:</label>
                 <select value={searchMode} onChange={handleModeChange}>
                     <option value="relevance">Relevance</option>
                     <option value="votes">Votes</option>

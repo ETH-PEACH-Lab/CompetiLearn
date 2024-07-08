@@ -14,7 +14,7 @@ def get_query_result(query):
                                   model='text-embedding-ada-002',
                                   chunk_size=100)  # each time submit chunk is depend on this chunk size
     store = Chroma(collection_name='kaggle_competition',
-                   persist_directory='F:/Desktop/PHD/RAG_project/RAG_project5/ChromDB/19988_filter_revise',
+                   persist_directory='F:/Desktop/PHD/RAG_project/RAG_project5/ChromDB/profile_images_10737_filter_revise',
                    embedding_function=embeddings)
 
     template = """You are a bot that answers questions about a Kaggle competition. 

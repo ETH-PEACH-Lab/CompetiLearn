@@ -166,8 +166,8 @@ def get_cell_content_endpoint():
     except (TypeError, ValueError) as e:
         return jsonify({'error': f'Invalid cell index: {cell_index_param}'}), 400
 
-    # notebook_path = os.path.abspath(os.path.join(current_dir, f'../data/competition_19988_filter/{notebook_title}'))
-    notebook_path = f'/app/data/competition_19988_filter/{notebook_title}'
+    # notebook_path = os.path.abspath(os.path.join(current_dir, f'../data/competition_profile_images_10737_filter/{notebook_title}'))
+    notebook_path = f'/app/data/competition_profile_images_10737_filter/{notebook_title}'
     print('notebook_path:', notebook_path)
     try:
         cell_content = get_cell_content(notebook_path, cell_index)
