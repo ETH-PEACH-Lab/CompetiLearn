@@ -1,6 +1,6 @@
 # README
 
-## Deployment
+## Run Docker Locally
 1. Download the `data.zip` and unzip it to `./data`
 
 2. Create `./.env` for the OPENAI API
@@ -12,14 +12,14 @@ OPENAI_API_KEY=YOUR_API_KEY
 ```
 3. Build docker
 ```
-docker-compose build
+docker-compose -f docker-compose_local.yml build
 ```
 4. Run docker
 ```
-docker-compose up
+docker-compose -f docker-compose_local.yml up
 ```
 
-## Run Locally
+## Run Server and Frontend Locally
 1. Create `./server/.env.local` for the OPENAI API
 
 ```

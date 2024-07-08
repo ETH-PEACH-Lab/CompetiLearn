@@ -6,8 +6,13 @@
 docker login ghcr.io --username github-account
 [Paste your GitHub token on this prompt]
 ```
+2. Build the image for the server
+```
+docker-compose build rag-amd64
+```
 
 2. Tag and push your Docker image
 ```
-docker tag rag_project-backend ghcr.io/eth-peach-lab/competilearn:latest
+docker tag rag-amd64 ghcr.io/eth-peach-lab/competilearn/rag-amd64:latest
+docker push ghcr.io/eth-peach-lab/competilearn/rag-amd64:latest
 ```
