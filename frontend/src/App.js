@@ -108,19 +108,19 @@ function App() {
                     className={`mode-button ${activeButton === 'rag_with_link' ? 'active' : ''}`}
                     onClick={() => handleButtonClick('rag_with_link')}
                 >
-                    RAG (with link)
+                    Alice
                 </button>
                 <button
                     className={`mode-button ${activeButton === 'rag_without_link' ? 'active' : ''}`}
                     onClick={() => handleButtonClick('rag_without_link')}
                 >
-                    RAG (without link)
+                    Bob
                 </button>
                 <button
                     className={`mode-button ${activeButton === 'gpt4o' ? 'active' : ''}`}
                     onClick={() => handleButtonClick('gpt4o')}
                 >
-                    GPT-4o
+                    Charlie
                 </button>
             </div>
             <ResultDisplay results={results} />
