@@ -28,7 +28,7 @@ def get_username(kernel_version_id0):
         return "default"
 
 def get_profile_image_path(username):
-    profile_images_dir = 'F:/Desktop/PHD/RAG_project/RAG_project5/profile_images_19988'
+    profile_images_dir = 'F:/Desktop/PHD/RAG_project/RAG_project5/profile_images_10737'
     image_path = os.path.join(profile_images_dir, f"{username}.jpg")
     if not os.path.exists(image_path):
         image_path = os.path.join(profile_images_dir, "default.jpg")

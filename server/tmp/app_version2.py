@@ -11,11 +11,11 @@ CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
-profile_images_folder = os.path.join(current_dir, '../../data/profile_images_19988')
+profile_images_folder = os.path.join(current_dir, '../../data/profile_images_10737')
 # Set the static folder for profile images
 app.config['PROFILE_IMAGES_FOLDER'] = profile_images_folder
 
-@app.route('/static/profile_images_19988/<filename>')
+@app.route('/static/profile_images_10737/<filename>')
 def serve_profile_image(filename):
     return send_from_directory(app.config['PROFILE_IMAGES_FOLDER'], filename)
 

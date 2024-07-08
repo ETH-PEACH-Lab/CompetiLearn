@@ -52,7 +52,7 @@ const ResultDisplay = ({ results, activeButton, isLoading }) => {
                     username: dataUsername,
                     votes: dataVotes,
                     views: dataViews,
-                    profileImage: `http://localhost:5001/static/profile_images_19988/${dataProfileImage}`
+                    profileImage: `http://localhost:5001/static/profile_images_10737/${dataProfileImage}`
                 }
             }));
         } catch (error) {
@@ -189,7 +189,7 @@ const ResultDisplay = ({ results, activeButton, isLoading }) => {
                                                 <li key={docIndex} className="source-document-container">
                                                     <div className="source-document-header">
                                                         <img
-                                                            src={additionalInfo[`${resultIndex}-${docIndex}`]?.profileImage || `http://localhost:5001/static/profile_images_19988/default.jpg`}
+                                                            src={additionalInfo[`${resultIndex}-${docIndex}`]?.profileImage || `http://localhost:5001/static/profile_images_10737/default.jpg`}
                                                             alt={`${additionalInfo[`${resultIndex}-${docIndex}`]?.username || 'default'}'s profile`}
                                                             className="profile-image"
                                                         />

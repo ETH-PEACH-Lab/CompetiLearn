@@ -8,6 +8,7 @@ from langchain.embeddings import OpenAIEmbeddings
 
 print(sys.version)
 directory = '/Users/junlingwang/myfiles/PHD/RAG_project/CompetiLearn/data/competition_10737_filter'
+
 class Document:
     def __init__(self, page_content, metadata):
         self.page_content = page_content
@@ -19,7 +20,7 @@ class Document:
 def get_metadata(notebook_path, content, first_cell_index):
     filename = os.path.basename(notebook_path)
     title = filename.replace('.ipynb', '')
-    source = directory+f"/{filename}"
+    source = directory + f"/{filename}"
     return {
         'title': title,
         'summary': content[:60] + '...',  # Or a different summary logic
@@ -65,7 +66,6 @@ def extract_notebook_content(path_to_notebook):
     return documents
 
 # Usage example
-# directory = 'F:/Desktop/PHD/RAG_project/RAG_project2/competition_19988_filter'
 all_documents = []
 
 for filename in os.listdir(directory):
@@ -74,16 +74,25 @@ for filename in os.listdir(directory):
         doc_list = extract_notebook_content(full_path)
         all_documents.extend(doc_list)
 
-embeddings = OpenAIEmbeddings(openai_api_key=os.environ.get('OPENAI_API_KEY'),
-                              model='text-embedding-ada-002',
-                              chunk_size=70)
+# Define the embedding with chunk size
+embedding = OpenAIEmbeddings(show_progress_bar=True, chunk_size=100, openai_api_key=os.environ.get('OPENAI_API_KEY'), model='text-embedding-ada-002')
 
-store = Chroma.from_documents(
-    all_documents, 
-    embeddings, 
-    ids=[f"{item.metadata['source']}-{index}" for index, item in enumerate(all_documents)],
-    collection_name="kaggle_competition", 
-    persist_directory='/Users/junlingwang/myfiles/PHD/RAG_project/CompetiLearn/data/ChromDB/10737_filter_revise',
-)
-store.persist()
-print('store success!')
+def split_list(input_list, chunk_size):
+    for i in range(0, len(input_list), chunk_size):
+        yield input_list[i:i + chunk_size]
+
+# Adjust chunk size to handle the maximum batch size limitation
+chunk_size = 5000  # Set to a value below the maximum batch size to avoid issues
+split_docs_chunked = split_list(all_documents, chunk_size)
+
+persist_directory = '/Users/junlingwang/myfiles/PHD/RAG_project/CompetiLearn/data/ChromDB/10737_filter_revise'
+
+for split_docs_chunk in split_docs_chunked:
+    vectordb = Chroma.from_documents(
+        documents=split_docs_chunk,
+        embedding=embedding,
+        persist_directory=persist_directory,
+    )
+    vectordb.persist()
+
+print('Store success!')

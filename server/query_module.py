@@ -52,9 +52,9 @@ def get_username(kernel_version_id0):
         return "default"
 
 def get_profile_image_path(username):
-    # profile_images_dir = os.path.abspath(os.path.join(current_dir, '../data/profile_images_19988'))
-    profile_images_dir = '/app/data/profile_images_19988'
-    # profile_images_dir = '../../profile_images_19988'
+    # profile_images_dir = os.path.abspath(os.path.join(current_dir, '../data/profile_images_10737'))
+    profile_images_dir = '/app/data/profile_images_10737'
+    # profile_images_dir = '../../profile_images_10737'
     image_path = os.path.join(profile_images_dir, f"{username}.jpg")
     if not os.path.exists(image_path):
         image_path = os.path.join(profile_images_dir, "default.jpg")
@@ -73,11 +73,11 @@ class CustomRetriever(BaseRetriever):
 def get_query_result_with_modes(query, search_mode='relevance', temperature=0.7):
     # persist_directory = os.path.join(current_dir, '../../ChromDB/19988_filter_revise')
     # persist_directory = os.path.abspath(os.path.join(current_dir, '../data/ChromDB/19988_filter_revise'))
-    persist_directory = '/app/data/ChromDB/19988_filter_revise'
+    persist_directory = '/app/data/ChromDB/10737_filter_revise'
     print(f"Persist directory: {persist_directory}")
     # /Users/junlingwang/myfiles/PHD/RAG_project/RAG_project5/ChromDB/19988_filter_revise
     embeddings = OpenAIEmbeddings(openai_api_key=os.environ.get('OPENAI_API_KEY'), model='text-embedding-ada-002', chunk_size=100)
-    store = Chroma(collection_name='kaggle_competition', persist_directory=persist_directory, embedding_function=embeddings)
+    store = Chroma(persist_directory=persist_directory, embedding_function=embeddings)
 
     template = """You are a bot that answers questions about a Kaggle competition. 
     The context includes other people's code that contains information necessary for answering the question. 

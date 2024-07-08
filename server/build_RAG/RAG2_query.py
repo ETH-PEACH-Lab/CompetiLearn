@@ -5,7 +5,7 @@ import pprint
 # from langchain.vectorstores import Chroma
 from langchain_community.vectorstores.chroma import Chroma
 from langchain.embeddings import OpenAIEmbeddings
-
+import os
 # template = """You are a bot that answers questions about Wimbledon 2023, using only the context provided.
 # If you don't know the answer, simply state that you don't know.
 
@@ -20,7 +20,7 @@ from langchain.embeddings import OpenAIEmbeddings
 embeddings = OpenAIEmbeddings(openai_api_key=os.environ.get('OPENAI_API_KEY'),
                               model = 'text-embedding-ada-002',
                                  chunk_size = 100) #each time submit chunk is depend on this chunk size
-store = Chroma(collection_name='kaggle_competition', persist_directory='/Users/junlingwang/myfiles/PHD/RAG_project/RAG_project5/ChromDB/19988_filter_revise', embedding_function=embeddings)
+store = Chroma(persist_directory='/Users/junlingwang/myfiles/PHD/RAG_project/CompetiLearn/data/ChromDB/10737_filter_revise', embedding_function=embeddings)
 # 'Mechanisms of Action (MoA) Prediction'
 template = """You are a bot that answers questions about a Kaggle competition. 
 The context includes other people's code that contains information necessary for answering the question. 

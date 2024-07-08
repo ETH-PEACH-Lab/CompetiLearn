@@ -7,7 +7,7 @@ import '../styles/RAGSourcePanel.css';
 const RAGSourcePanel = ({ doc, docIndex }) => {
     const baseUrl = `http://localhost:5001`;
 
-    const [sourceMeta, setSourceMeta] = useState({ username: 'default', votes: 'Loading...', views: 'Loading...', profileImage: `${baseUrl}/static/profile_images_19988/default.jpg`, url: '' });
+    const [sourceMeta, setSourceMeta] = useState({ username: 'default', votes: 'Loading...', views: 'Loading...', profileImage: `${baseUrl}/static/profile_images_10737/default.jpg`, url: '' });
     const [cellContents, setCellContents] = useState([]);
 
     async function fetchData(url) {
@@ -35,7 +35,7 @@ const RAGSourcePanel = ({ doc, docIndex }) => {
                 votes: responseVotes,
                 views: responseViews,
                 url: responseURL.url,
-                profileImage: `${baseUrl}/static/profile_images_19988/${responseProfileImage}`
+                profileImage: `${baseUrl}/static/profile_images_10737/${responseProfileImage}`
             }
             setSourceMeta(result)
         } catch (error) {

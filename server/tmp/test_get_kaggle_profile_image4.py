@@ -63,7 +63,7 @@ def process_profile(user_name, driver_path, image_save_directory):
         driver.quit()
 
 # Define the paths
-image_save_directory = r'F:\Desktop\PHD\RAG_project\RAG_project5\profile_images_19988'
+image_save_directory = r'F:\Desktop\PHD\RAG_project\RAG_project5\profile_images_10737'
 driver_path = ChromeDriverManager().install()
 
 # Create the directory to save images if it does not exist
