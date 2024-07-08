@@ -1,31 +1,40 @@
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_from_directory, stream_with_context, Response
 from flask_cors import CORS
 from flask_caching import Cache
 from query_module import (
     get_username, get_kernel_vote, get_kernel_view,
     get_profile_image_path, get_query_result_with_modes,
-    get_query_result_no_link, get_query_result_gpt4o
+    get_query_result_no_link, get_query_result_gpt4o, 
+    get_query_result_gpt4o_stream, 
+    get_query_result_rag_stream
 )
 from kaggle_post_retrieve_module import get_kernel_url
 import os
 import nbformat
 from dotenv import load_dotenv
+import time
+from utils import document_to_dict
+
 dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
 load_dotenv(dotenv_path)
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='../frontend/build', static_url_path='/')
 # Configure CORS to allow requests from localhost:3000
-# CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
-CORS(app, resources={r"/*": {"origins": ["http://localhost:3000", "http://10.6.130.123:3000"]}})
+CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
 cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 
-# current_dir = os.path.dirname(os.path.abspath(__file__))
-# profile_images_folder = os.path.abspath(os.path.join(current_dir, '../data/profile_images_10737'))
-
-profile_images_folder = '/app/data/profile_images_10737'      # os.path.abspath(os.path.join(current_dir, relative_path))
+profile_images_folder = '/app/data/profile_images_10737'
 print(f"Profile images folder: {profile_images_folder}")
 app.config['PROFILE_IMAGES_FOLDER'] = profile_images_folder
+
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def serve(path):
+    if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
+        return send_from_directory(app.static_folder, path)
+    else:
+        return send_from_directory(app.static_folder, 'index.html')
 
 @app.route('/static/profile_images_10737/<filename>')
 def serve_profile_image(filename):
@@ -93,6 +102,23 @@ def search():
     print(result_serializable)
     
     return jsonify(result_serializable)
+
+@app.route('/stream', methods=['POST'])
+def stream():
+    data = request.json
+    query = data.get('query', '')
+    mode = data.get('mode', 'rag_with_link')
+    temperature = data.get('temperature', 0.7)
+    search_mode = data.get('search_mode', 'relevance')
+    print(f'Received stream query: {query}, mode: {mode}, search_mode: {search_mode}, temperature: {temperature}')
+    
+    if mode == 'rag_with_link':
+        result = Response(stream_with_context(get_query_result_rag_stream(query, search_mode, temperature, return_source=True)), content_type='text/event-stream')
+    elif mode == 'rag_without_link':
+        result = Response(stream_with_context(get_query_result_rag_stream(query, search_mode, temperature, return_source=False)), content_type='text/event-stream')
+    elif mode == 'gpt4o':
+        result = Response(stream_with_context(get_query_result_gpt4o_stream(query, temperature)), content_type='text/event-stream')
+    return result
 
 @app.route('/get_kernel_url', methods=['GET'])
 def kernel_url():
@@ -166,8 +192,7 @@ def get_cell_content_endpoint():
     except (TypeError, ValueError) as e:
         return jsonify({'error': f'Invalid cell index: {cell_index_param}'}), 400
 
-    # notebook_path = os.path.abspath(os.path.join(current_dir, f'../data/competition_profile_images_10737_filter/{notebook_title}'))
-    notebook_path = f'/app/data/competition_profile_images_10737_filter/{notebook_title}'
+    notebook_path = f'/app/data/competition_10737_filter/{notebook_title}'
     print('notebook_path:', notebook_path)
     try:
         cell_content = get_cell_content(notebook_path, cell_index)
@@ -176,4 +201,4 @@ def get_cell_content_endpoint():
         return jsonify({'error': f'Notebook {notebook_title} not found.'}), 404
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001)  # Change port to 5001
+    app.run(debug=True, host='0.0.0.0', port=5001)  # Ensure it runs on 0.0.0.0 to be accessible from outside the container

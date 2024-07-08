@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import Markdown from 'react-markdown';
+import rehypeRaw from "rehype-raw";
+
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism'
 
 import '../styles/RAGSourcePanel.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faThumbsUp } from '@fortawesome/free-solid-svg-icons';
-import Editor from '@monaco-editor/react';
-import ReactMarkdown from 'react-markdown';
 
 const RAGSourcePanel = ({ doc, docIndex }) => {
     const baseUrl = `http://localhost:5001`;
@@ -117,6 +117,7 @@ ${cell.source}
                                                     )
                                                 }
                                             }}
+                                            rehypePlugins={[rehypeRaw]}
                                         />
                                     </div>
                                 </div>
