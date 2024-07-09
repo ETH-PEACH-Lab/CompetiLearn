@@ -13,6 +13,6 @@ docker-compose build rag-amd64
 
 2. Tag and push your Docker image
 ```
-docker tag rag-amd64 ghcr.io/eth-peach-lab/competilearn/rag-amd64:latest
+docker tag <your-image-id> ghcr.io/eth-peach-lab/competilearn/rag-amd64:latest
 docker push ghcr.io/eth-peach-lab/competilearn/rag-amd64:latest
 ```

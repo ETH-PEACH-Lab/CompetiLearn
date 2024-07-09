@@ -70,7 +70,15 @@ function App() {
             let rawSource = results.filter(message => message.startsWith('Source: '))
             if(rawSource.length > 0){
                 let rawSourceData = rawSource[0].replace('Source: ', '').replace('$EOL', '');
-                let source_documents = JSON.parse(rawSourceData)
+                let source_documents = [];
+                if(rawSourceData!=='None') {
+                    try {
+                        source_documents = JSON.parse(rawSourceData);
+                    } catch (error) {
+                        console.error("Failed to parse JSON:", error);
+                        source_documents = []; // or any default value you prefer
+                    }    
+                }
                 const newResult = { query: data.query, response: streamedMessage, mode: data.mode, source_documents };
                 setResults(prevResults => [...prevResults.slice(0, prevResults.length - 1), newResult]);
             }
