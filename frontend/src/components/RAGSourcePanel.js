@@ -9,14 +9,13 @@ import '../styles/RAGSourcePanel.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faThumbsUp } from '@fortawesome/free-solid-svg-icons';
 
-const RAGSourcePanel = ({ doc, docIndex }) => {
-    const baseUrl = process.env.REACT_APP_BACKEND_URL;
+const RAGSourcePanel = ({ doc }) => {
 
-    const [sourceMeta, setSourceMeta] = useState({ username: 'default', votes: 'Loading...', views: 'Loading...', profileImage: `${baseUrl}/static/profile_images_10737/default.jpg`, url: '' });
+    const [sourceMeta, setSourceMeta] = useState({ username: 'default', votes: 'Loading...', views: 'Loading...', profileImage: `/static/profile_images_10737/default.jpg`, url: '' });
     const [cellContents, setCellContents] = useState([]);
 
     async function fetchData(url) {
-        const response = await fetch(`${baseUrl}${url}`);
+        const response = await fetch(`${url}`);
         if (!response.ok) {
             throw new Error(`Error fetching data from ${url}: ${response.statusText}`);
         }
@@ -44,7 +43,7 @@ const RAGSourcePanel = ({ doc, docIndex }) => {
                 comment: 20,
                 title: 'Moa | Feature Selection | Cp_dose | Cp_time',
                 update:'4y ago',
-                profileImage: `${baseUrl}/static/profile_images_10737/${responseProfileImage}`
+                profileImage: `/static/profile_images_10737/${responseProfileImage}`
             }
             setSourceMeta(result)
         } catch (error) {
