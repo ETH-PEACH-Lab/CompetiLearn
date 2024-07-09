@@ -15,32 +15,34 @@ from dotenv import load_dotenv
 import time
 from utils import document_to_dict
 
-dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
+dotenv_path = os.path.join(current_dir, '../.env')
 load_dotenv(dotenv_path)
 
-app = Flask(__name__, static_folder='public', static_url_path='/')
+frontend_path = os.path.join(current_dir, '../frontend/build')
+profile_images_folder = os.path.join(current_dir, '../data/profile_images_10737')
+notebook_folder = os.path.join(current_dir, '../data/competition_10737_filter/')
+
+print(f"Profile images folder: {profile_images_folder}")
+
+app = Flask(__name__, static_folder=frontend_path, static_url_path='/')
 # Configure CORS to allow requests from localhost:3000
-CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
+CORS(app)
+
+# CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 # CORS(app, resources={r"/*": {"origins": ["http://localhost:3000", "http://10.6.130.123:3000"]}})
 
 cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 
-# current_dir = os.path.dirname(os.path.abspath(__file__))
-profile_images_folder = '/app/data/profile_images_10737'
-# os.path.abspath(os.path.join(current_dir, relative_path))
-print(f"Profile images folder: {profile_images_folder}")
 app.config['PROFILE_IMAGES_FOLDER'] = profile_images_folder
 
 @app.route('/')
-def serve_frontend():
-    return send_from_directory(app.static_folder, 'index.html')
-def serve_react_app():
-    return send_from_directory(app.static_folder, 'index.html')
 @app.route('/<path:path>')
-def serve_static_files(path):
-    if os.path.exists(os.path.join(app.static_folder, path)):
+def serve_react_app(path='index.html'):
+    try:
         return send_from_directory(app.static_folder, path)
-    else:
+    except FileNotFoundError:
         return send_from_directory(app.static_folder, 'index.html')
 
 @app.route('/static/profile_images_10737/<filename>')
@@ -130,17 +132,6 @@ def stream():
         print('result:', result)
     return result
 
-# @app.route('/api/chat', methods=['POST'])
-# def streamed_response():
-#     data = request.json
-#     query = data.get('message', '')
-#     def generate():
-#         for i in range(10):
-#             yield f"data: {i}\n\n"
-#             time.sleep(1)
-#     return Response(stream_with_context(generate()), content_type='text/event-stream')
-    # return Response(stream_with_context(get_query_result_gpt4o_stream(query, 0.7)), content_type='text/event-stream', mimetype='text/event-stream')
-
 @app.route('/get_kernel_url', methods=['GET'])
 def kernel_url():
     kernel_id = request.args.get('kernel_id')
@@ -212,14 +203,12 @@ def get_cell_content_endpoint():
         cell_index = int(cell_index_param)
     except (TypeError, ValueError) as e:
         return jsonify({'error': f'Invalid cell index: {cell_index_param}'}), 400
-
-    notebook_path = f'/app/data/competition_10737_filter/{notebook_title}'
-    print('notebook_path:', notebook_path)
+    notebook_path = os.path.join(notebook_folder, notebook_title)
     try:
         cell_content = get_cell_content(notebook_path, cell_index)
         return jsonify(cell_content)
     except FileNotFoundError:
-        return jsonify({'error': f'Notebook {notebook_title} not found.'}), 404
+        return jsonify({'error': f'Notebook {notebook_title} not found. {notebook_path}'}), 404
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5001)    # Change port to 5001

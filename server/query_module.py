@@ -6,7 +6,6 @@ from langchain.prompts import PromptTemplate
 from langchain_openai import ChatOpenAI
 from langchain_community.vectorstores.chroma import Chroma
 from langchain_openai import OpenAIEmbeddings
-# from langchain_community.embeddings import OpenAIEmbeddings
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from openai import OpenAI
@@ -18,10 +17,7 @@ from queue import Queue
 from threading import Thread
 import json
 from utils import documents_to_json
-
 import sys
-
-# from langchain.callbacks.base import BaseCallbackHandler
 from pydantic import Field
 
 client = OpenAI(
@@ -34,8 +30,11 @@ SHOW_INTERMEDIATE_LOG = os.getenv("SHOW_INTERMEDIATE_LOG", "True").lower() in ("
 current_dir = os.path.dirname(os.path.abspath(__file__))
 
 # Construct the full path to the CSV file
-# csv_path = os.path.abspath(os.path.join(current_dir, '../data/middle_file3.csv'))
-csv_path = '/app/data/middle_file3.csv'
+csv_path = os.path.abspath(os.path.join(current_dir, '../data/middle_file3.csv'))
+persist_directory = os.path.abspath(os.path.join(current_dir, '../data/ChromDB/10737_filter_revise'))
+profile_images_folder = os.path.join(current_dir, '../data/profile_images_10737')
+
+
 middle_df = pd.read_csv(csv_path)
 
 class QueueCallbackHandler(BaseCallbackHandler):
@@ -82,11 +81,11 @@ def get_username(kernel_version_id0):
         return "default"
 
 def get_profile_image_path(username):
-    profile_images_dir = '/app/data/profile_images_10737'
+    # profile_images_dir = '/app/data/profile_images_10737'
     # profile_images_dir = '../../profile_images_19988'
-    image_path = os.path.join(profile_images_dir, f"{username}.jpg")
+    image_path = os.path.join(profile_images_folder, f"{username}.jpg")
     if not os.path.exists(image_path):
-        image_path = os.path.join(profile_images_dir, "default.jpg")
+        image_path = os.path.join(profile_images_folder, "default.jpg")
     return image_path
 
 class CustomRetriever(BaseRetriever):
@@ -100,11 +99,6 @@ class CustomRetriever(BaseRetriever):
         return self.documents
 
 def get_query_result_with_modes(query, search_mode='relevance', temperature=0.7):
-    # persist_directory = os.path.join(current_dir, '../../ChromDB/19988_filter_revise')
-    # persist_directory = os.path.abspath(os.path.join(current_dir, '../data/ChromDB/19988_filter_revise'))
-    persist_directory = '/app/data/ChromDB/10737_filter_revise'
-    print(f"Persist directory: {persist_directory}")
-    # /Users/junlingwang/myfiles/PHD/RAG_project/RAG_project5/ChromDB/19988_filter_revise
     embeddings = OpenAIEmbeddings(openai_api_key=os.environ.get('OPENAI_API_KEY'), model='text-embedding-ada-002', chunk_size=100)
     store = Chroma(persist_directory=persist_directory, embedding_function=embeddings)
 
@@ -126,7 +120,6 @@ def get_query_result_with_modes(query, search_mode='relevance', temperature=0.7)
         retriever = store.as_retriever(search_type="mmr", search_kwargs={"k": 3})
     else:
         docs = store.search(query, search_type="mmr", k=10)
-        # print("Documents retrieved:", docs)  # Print the retrieved documents
         if search_mode == 'votes':
             for doc in docs:
                 doc.metadata['votes'] = get_kernel_vote(doc.metadata['title'])
@@ -185,10 +178,6 @@ def get_query_result_gpt4o_stream(query, temperature=0.7):
 
 
 def get_query_result_rag_stream(query, search_mode='relevance', temperature=0.7, return_source=False):
-    # persist_directory = os.path.join(current_dir, '../../ChromDB/19988_filter_revise')
-    persist_directory = "/app/data/ChromDB/10737_filter_revise"
-    print(f"Persist directory: {persist_directory}")
-    # /Users/junlingwang/myfiles/PHD/RAG_project/RAG_project5/ChromDB/19988_filter_revise
     embeddings = OpenAIEmbeddings(openai_api_key=os.environ.get('OPENAI_API_KEY'), model='text-embedding-ada-002', chunk_size=100)
     store = Chroma(persist_directory=persist_directory, embedding_function=embeddings)
 
@@ -214,13 +203,11 @@ def get_query_result_rag_stream(query, search_mode='relevance', temperature=0.7,
     )
 
     if search_mode == 'relevance':
-        # retriever = store.as_retriever(search_type="mmr", search_kwargs={"k": 3})
         docs = store.search(query, search_type="mmr", k=3)
         print("Documents retrieved:", docs)  # Print the retrieved documents
         retriever = CustomRetriever(documents=docs)
     else:
         docs = store.search(query, search_type="mmr", k=10)
-        # print("Documents retrieved:", docs)  # Print the retrieved documents
         if search_mode == 'votes':
             for doc in docs:
                 doc.metadata['votes'] = get_kernel_vote(doc.metadata['title'])

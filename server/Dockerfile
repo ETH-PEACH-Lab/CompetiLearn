@@ -21,10 +21,11 @@ RUN curl -fsSL https://deb.nodesource.com/setup_14.x | bash - && \
 RUN node -v && npm -v
 
 # Copy the server code to /app
-COPY server /app
+COPY server /app/server
 
 # Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+RUN cd /app/server && \
+    pip install --no-cache-dir -r requirements.txt
 
 # Copy frontend code to /app/frontend
 COPY frontend /app/frontend
@@ -35,11 +36,11 @@ RUN cd /app/frontend && \
     npm run build
 
 # Copy build files to the Flask public directory
-RUN mkdir -p /app/public && \
-    cp -r /app/frontend/build/* /app/public/
+# RUN mkdir -p /app/public && \
+#     cp -r /app/frontend/build/* /app/public/
 
 # Make port 5001 available to the world outside this container
 EXPOSE 5001
 
 # Run app.py when the container launches
-CMD ["python", "app.py"]
+CMD ["python", "./server/app.py"]

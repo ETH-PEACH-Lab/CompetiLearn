@@ -10,7 +10,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faThumbsUp } from '@fortawesome/free-solid-svg-icons';
 
 const RAGSourcePanel = ({ doc, docIndex }) => {
-    const baseUrl = `http://localhost:5001`;
+    const baseUrl = process.env.REACT_APP_BACKEND_URL;
 
     const [sourceMeta, setSourceMeta] = useState({ username: 'default', votes: 'Loading...', views: 'Loading...', profileImage: `${baseUrl}/static/profile_images_10737/default.jpg`, url: '' });
     const [cellContents, setCellContents] = useState([]);
