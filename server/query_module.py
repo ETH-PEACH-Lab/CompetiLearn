@@ -19,6 +19,7 @@ import json
 from utils import documents_to_json
 import sys
 from pydantic import Field
+import tiktoken
 
 client = OpenAI(
     api_key=os.environ.get('OPENAI_API_KEY'),
@@ -88,15 +89,41 @@ def get_profile_image_path(username):
         image_path = os.path.join(profile_images_folder, "default.jpg")
     return image_path
 
+def truncate_context(context: str, max_tokens: int = 1000) -> str:
+    tokenizer = tiktoken.get_encoding("cl100k_base")
+    tokens = tokenizer.encode(context)
+    if len(tokens) > max_tokens:
+        tokens = tokens[:max_tokens]
+    return tokenizer.decode(tokens)
+
 class CustomRetriever(BaseRetriever):
     documents: List[Document] = Field(default_factory=list)
+    max_tokens: int = 1000 # maximum tokens for context
 
-    def __init__(self, documents: List[Document]):
+    def __init__(self, documents: List[Document], max_tokens: int = 1000):
         super().__init__()
         self.documents = documents
+        self.max_tokens = max_tokens
 
     def get_relevant_documents(self, query: str, *, run_manager: CallbackManagerForRetrieverRun = None) -> List[Document]:
-        return self.documents
+        return self._truncate_documents(self.documents)
+
+    def _truncate_documents(self, documents: List[Document]) -> List[Document]:
+        total_tokens = 0
+        truncated_documents = []
+        tokenizer = tiktoken.get_encoding("cl100k_base")
+
+        for doc in documents:
+            doc_tokens = len(tokenizer.encode(doc.page_content))
+            if total_tokens + doc_tokens <= self.max_tokens:
+                truncated_documents.append(doc)
+                total_tokens += doc_tokens
+            else:
+                truncated_content = tokenizer.decode(tokenizer.encode(doc.page_content)[:self.max_tokens - total_tokens])
+                truncated_documents.append(Document(page_content=truncated_content))
+                break
+        
+        return truncated_documents
 
 def get_query_result_with_modes(query, search_mode='relevance', temperature=0.7):
     embeddings = OpenAIEmbeddings(openai_api_key=os.environ.get('OPENAI_API_KEY'), model='text-embedding-ada-002', chunk_size=100)
