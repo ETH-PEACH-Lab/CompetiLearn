@@ -7,7 +7,7 @@ from langchain_community.vectorstores.chroma import Chroma
 from langchain.embeddings import OpenAIEmbeddings
 
 print(sys.version)
-directory = '/Users/junlingwang/myfiles/PHD/RAG_project/CompetiLearn/data/competition_10737_filter'
+directory = '/Users/junlingwang/myfiles/PHD/RAG_project/CompetiLearn/data/competition_10737_filter_python'
 
 class Document:
     def __init__(self, page_content, metadata):
@@ -85,7 +85,7 @@ def split_list(input_list, chunk_size):
 chunk_size = 5000  # Set to a value below the maximum batch size to avoid issues
 split_docs_chunked = split_list(all_documents, chunk_size)
 
-persist_directory = '/Users/junlingwang/myfiles/PHD/RAG_project/CompetiLearn/data/ChromDB/10737_filter_revise'
+persist_directory = '/Users/junlingwang/myfiles/PHD/RAG_project/CompetiLearn/data/ChromDB/10737_filter_revise_python'
 
 for split_docs_chunk in split_docs_chunked:
     vectordb = Chroma.from_documents(

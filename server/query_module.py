@@ -32,7 +32,7 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 
 # Construct the full path to the CSV file
 csv_path = os.path.abspath(os.path.join(current_dir, '../data/middle_file3.csv'))
-persist_directory = os.path.abspath(os.path.join(current_dir, '../data/ChromDB/10737_filter_revise'))
+persist_directory = os.path.abspath(os.path.join(current_dir, '../data/ChromDB/10737_filter_revise_python'))
 profile_images_folder = os.path.join(current_dir, '../data/profile_images_10737')
 
 

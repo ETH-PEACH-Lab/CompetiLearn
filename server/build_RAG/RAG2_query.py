@@ -20,7 +20,7 @@ import os
 embeddings = OpenAIEmbeddings(openai_api_key=os.environ.get('OPENAI_API_KEY'),
                               model = 'text-embedding-ada-002',
                                  chunk_size = 100) #each time submit chunk is depend on this chunk size
-store = Chroma(persist_directory='/Users/junlingwang/myfiles/PHD/RAG_project/CompetiLearn/data/ChromDB/10737_filter_revise', embedding_function=embeddings)
+store = Chroma(persist_directory='/Users/junlingwang/myfiles/PHD/RAG_project/CompetiLearn/data/ChromDB/10737_filter_revise_python', embedding_function=embeddings)
 # 'Mechanisms of Action (MoA) Prediction'
 template = """You are a bot that answers questions about a Kaggle competition. 
 The context includes other people's code that contains information necessary for answering the question. 

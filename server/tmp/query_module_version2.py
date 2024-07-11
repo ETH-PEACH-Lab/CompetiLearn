@@ -70,7 +70,7 @@ class CustomRetriever(BaseRetriever):
 
 def get_query_result(query, temperature=0.7):
     embeddings = OpenAIEmbeddings(openai_api_key=os.environ.get('OPENAI_API_KEY'), model='text-embedding-ada-002', chunk_size=100)
-    store = Chroma(collection_name='kaggle_competition', persist_directory='F:/Desktop/PHD/RAG_project/RAG_project5/ChromDB/profile_images_10737_filter_revise', embedding_function=embeddings)
+    store = Chroma(collection_name='kaggle_competition', persist_directory='F:/Desktop/PHD/RAG_project/RAG_project5/ChromDB/profile_images_10737_filter_revise_python', embedding_function=embeddings)
 
     template = """You are a bot that answers questions about a Kaggle competition. 
     The context includes other people's code that contains information necessary for answering the question. 
@@ -133,7 +133,7 @@ def get_query_result_gpt4o(query, temperature=0.7):
 # New function to handle different search modes
 def get_query_result_with_modes(query, search_mode='relevance', temperature=0.7):
     embeddings = OpenAIEmbeddings(openai_api_key=os.environ.get('OPENAI_API_KEY'), model='text-embedding-ada-002', chunk_size=100)
-    store = Chroma(collection_name='kaggle_competition', persist_directory='F:/Desktop/PHD/RAG_project/RAG_project5/ChromDB/profile_images_10737_filter_revise', embedding_function=embeddings)
+    store = Chroma(collection_name='kaggle_competition', persist_directory='F:/Desktop/PHD/RAG_project/RAG_project5/ChromDB/profile_images_10737_filter_revise_python', embedding_function=embeddings)
 
     template = """You are a bot that answers questions about a Kaggle competition. 
     The context includes other people's code that contains information necessary for answering the question. 

@@ -83,7 +83,7 @@ store = Chroma.from_documents(
     embeddings, 
     ids=[f"{item.metadata['source']}-{index}" for index, item in enumerate(all_documents)],
     collection_name="kaggle_competition", 
-    persist_directory='/Users/junlingwang/myfiles/PHD/RAG_project/CompetiLearn/data/ChromDB/10737_filter_revise',
+    persist_directory='/Users/junlingwang/myfiles/PHD/RAG_project/CompetiLearn/data/ChromDB/10737_filter_revise_python',
 )
 store.persist()
 print('store success!')
