@@ -22,7 +22,7 @@ load_dotenv(dotenv_path)
 
 frontend_path = os.path.join(current_dir, '../frontend/build')
 profile_images_folder = os.path.join(current_dir, '../data/profile_images_10737')
-notebook_folder = os.path.join(current_dir, '../data/competition_10737_filter/')
+notebook_folder = os.path.join(current_dir, '../data/competition_10737_filter_python/')
 
 print(f"Profile images folder: {profile_images_folder}")
 

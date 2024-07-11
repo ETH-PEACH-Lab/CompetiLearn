@@ -36,7 +36,7 @@ def summarize_languages_in_folder_and_copy_python(folder_path, destination_folde
     return language_counter
 
 # Example usage:
-folder_path = '/Users/junlingwang/myfiles/PHD/RAG_project/CompetiLearn/data/competition_10737_filter'
+folder_path = '/Users/junlingwang/myfiles/PHD/RAG_project/CompetiLearn/data/competition_10737_filter_python'
 destination_folder = '/Users/junlingwang/myfiles/PHD/RAG_project/CompetiLearn/data/competition_10737_filter_python'
 language_summary = summarize_languages_in_folder_and_copy_python(folder_path, destination_folder)
 

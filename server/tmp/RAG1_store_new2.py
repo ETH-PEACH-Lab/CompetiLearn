@@ -7,7 +7,7 @@ from langchain_community.vectorstores.chroma import Chroma
 from langchain.embeddings import OpenAIEmbeddings
 
 print(sys.version)
-directory = '/Users/junlingwang/myfiles/PHD/RAG_project/CompetiLearn/data/competition_10737_filter'
+directory = '/Users/junlingwang/myfiles/PHD/RAG_project/CompetiLearn/data/competition_10737_filter_python'
 class Document:
     def __init__(self, page_content, metadata):
         self.page_content = page_content
