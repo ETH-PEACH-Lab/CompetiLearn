@@ -2,8 +2,11 @@
 
 # data
 /data
+/record
 /venv
 /tmp
+/server/flask_session/
+/server/test_query_history.py
 # dependencies
 /node_modules
 /.pnp

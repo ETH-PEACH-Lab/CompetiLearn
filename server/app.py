@@ -3,8 +3,7 @@ from flask_cors import CORS
 from flask_caching import Cache
 from query_module import (
     get_username, get_kernel_vote, get_kernel_view,
-    get_profile_image_path, get_query_result_with_modes,
-    get_query_result_no_link, get_query_result_gpt4o, 
+    get_profile_image_path, 
     get_query_result_gpt4o_stream, 
     get_query_result_rag_stream
 )
@@ -14,6 +13,9 @@ import nbformat
 from dotenv import load_dotenv
 import time
 from utils import document_to_dict
+from flask import session
+from flask_session import Session
+
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -27,6 +29,12 @@ notebook_folder = os.path.join(current_dir, '../data/competition_10737_filter_py
 print(f"Profile images folder: {profile_images_folder}")
 
 app = Flask(__name__, static_folder=frontend_path, static_url_path='/')
+
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your_secret_key')  # Ensure you have a secret key
+app.config['SESSION_TYPE'] = 'filesystem'  # Using the filesystem to store sessions
+
+# Initialize session management
+Session(app)
 # Configure CORS to allow requests from localhost:3000
 CORS(app)
 
@@ -120,15 +128,18 @@ def stream():
     temperature = data.get('temperature', 0.7)
     search_mode = data.get('search_mode', 'relevance')
     print(f'Received stream query: {query}, mode: {mode}, search_mode: {search_mode}, temperature: {temperature}')
-    
+    # Ensure session ID exists
+    if 'session_id' not in session:
+        session['session_id'] = os.urandom(24).hex()
+        
     if mode == 'rag_with_link':
-        result = Response(stream_with_context(get_query_result_rag_stream(query, search_mode, temperature, return_source=True)), content_type='text/event-strean')
+        result = Response(stream_with_context(get_query_result_rag_stream(query, search_mode, temperature, return_source=True,mode=mode)), content_type='text/event-strean')
         print('result:', result)    
     elif mode == 'rag_without_link':
-        result = Response(stream_with_context(get_query_result_rag_stream(query, search_mode, temperature, return_source=False)), content_type='text/event-stream')
+        result = Response(stream_with_context(get_query_result_rag_stream(query, search_mode, temperature, return_source=False,mode=mode)), content_type='text/event-stream')
         print('result:', result)
     elif mode == 'gpt4o':
-        result = Response(stream_with_context(get_query_result_gpt4o_stream(query, temperature)), content_type='text/event-stream')
+        result = Response(stream_with_context(get_query_result_gpt4o_stream(query, temperature,mode=mode)), content_type='text/event-stream')
         print('result:', result)
     return result
 
