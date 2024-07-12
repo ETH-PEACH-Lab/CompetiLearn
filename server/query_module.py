@@ -157,7 +157,55 @@ def store_query_data(query, response, session_id, ip_address, mode, search_mode)
         df.to_csv(record_path, index=False)
     else:
         df.to_csv(record_path, mode='a', header=False, index=False)
-def get_query_result_gpt4o_stream(query, temperature=0.7,mode='gpt4o'):
+
+def store_clear_history_signal(session_id, ip_address):
+    timestamp = pd.Timestamp.now()
+    data = {
+        'timestamp': [timestamp],
+        'session_id': [session_id],
+        'ip_address': [ip_address],
+        'mode': ['clear_history'],
+        'search_mode': ['N/A'],
+        'query': ['N/A'],
+        'response': ['N/A']
+    }
+    df = pd.DataFrame(data)
+    if not os.path.exists(record_path):
+        df.to_csv(record_path, index=False)
+    else:
+        df.to_csv(record_path, mode='a', header=False, index=False)
+
+
+def get_history(session_id, mode, limit=3):
+    if not os.path.exists(record_path):
+        return ""
+    
+    df = pd.read_csv(record_path)
+    session_records = df[df['session_id'] == session_id].iloc[::-1]
+    
+    history = []
+    count = 0
+
+    for i in range(len(session_records)):
+        if session_records.iloc[i]['mode'] == 'clear_history':
+            break
+        if session_records.iloc[i]['mode'] != mode:
+            break
+        history.append(f"user query: {session_records.iloc[i]['query']}\nsystem response: {session_records.iloc[i]['response']}\n")
+        count += 1
+        if count >= limit:
+            break
+
+    if history:
+        return "Previous conversation:\n" + "\n".join(history[::-1]) + "\n"
+    return ""
+
+def get_query_result_gpt4o_stream(query, temperature=0.7, mode=None):
+    session_id = session.get('session_id')
+    history = get_history(session_id, mode, limit=3)
+    print(f"Previous conversation: {history}")
+    query = f"{history}Question: {query}"
+
     openai_response = client.chat.completions.create(
         model="gpt-4o",
         messages=[{"role": "user", "content": query}],
@@ -172,13 +220,16 @@ def get_query_result_gpt4o_stream(query, temperature=0.7,mode='gpt4o'):
             response_text += text
             yield f"Result: {text}$EOL"
     
-    session_id = session.get('session_id')
     ip_address = request.remote_addr
     store_query_data(query, response_text, session_id, ip_address, mode, 'N/A')
 
-
-
 def get_query_result_rag_stream(query, search_mode='relevance', temperature=0.7, return_source=False, mode=None):
+    
+    session_id = session.get('session_id')
+    history = get_history(session_id, mode, limit=3)
+    print(f"History: {history}")
+    query = f"{history}Question: {query}"
+    
     embeddings = OpenAIEmbeddings(openai_api_key=os.environ.get('OPENAI_API_KEY'), model='text-embedding-ada-002', chunk_size=100)
     store = Chroma(persist_directory=persist_directory, embedding_function=embeddings)
 
@@ -189,7 +240,7 @@ def get_query_result_rag_stream(query, search_mode='relevance', temperature=0.7,
 
     Context: {context} \n\n
 
-    Question: {question}"""
+    {question}"""
 
     PROMPT = PromptTemplate(template=template, input_variables=["context", "question"])
     output_queue = Queue()
@@ -259,7 +310,7 @@ def get_query_result_rag_stream(query, search_mode='relevance', temperature=0.7,
         if return_source:
             yield f"Source: {source_documents_holder[0]}$EOL"
         
-        session_id = session.get('session_id')
+        # session_id = session.get('session_id')
         ip_address = request.remote_addr
         store_query_data(query, response_text, session_id, ip_address, mode, search_mode)
 

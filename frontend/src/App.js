@@ -94,7 +94,26 @@ function App() {
         setResults([]);
         setIsAdvancedSearchOpen(false);  // Close advanced search if open
         localStorage.removeItem('chatHistory');  // Clear local storage
+    
+        // Send a signal to the backend
+        fetch('/new_chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        }).then(response => {
+            if (response.ok) {
+                console.log('New chat started successfully');
+            } else {
+                console.log('Failed to start a new chat');
+            }
+        }).catch(error => {
+            console.error('Error:', error);
+        });
     };
+    
+    
+
 
     const toggleAdvancedSearch = () => {
         setIsAdvancedSearchOpen(!isAdvancedSearchOpen);

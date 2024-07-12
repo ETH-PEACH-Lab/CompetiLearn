@@ -5,7 +5,7 @@ from query_module import (
     get_username, get_kernel_vote, get_kernel_view,
     get_profile_image_path, 
     get_query_result_gpt4o_stream, 
-    get_query_result_rag_stream
+    get_query_result_rag_stream, store_clear_history_signal
 )
 from kaggle_post_retrieve_module import get_kernel_url
 import os
@@ -142,6 +142,16 @@ def stream():
         result = Response(stream_with_context(get_query_result_gpt4o_stream(query, temperature,mode=mode)), content_type='text/event-stream')
         print('result:', result)
     return result
+
+@app.route('/new_chat', methods=['POST'])
+def new_chat():
+    session_id = session.get('session_id')
+    if session_id:
+        # Add a row to record.csv to indicate clearing history
+        ip_address = request.remote_addr
+        store_clear_history_signal(session_id, ip_address)
+    return jsonify({'status': 'success'}), 200
+
 
 @app.route('/get_kernel_url', methods=['GET'])
 def kernel_url():
