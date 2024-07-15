@@ -36,7 +36,7 @@ csv_path = os.path.abspath(os.path.join(current_dir, '../data/middle_file3.csv')
 persist_directory = os.path.abspath(os.path.join(current_dir, '../data/ChromDB/10737_filter_revise_python'))
 profile_images_folder = os.path.join(current_dir, '../data/profile_images_10737')
 record_path = os.path.join(current_dir, '../record/record.csv')
-
+log_path = os.path.join(current_dir, '../record/log.txt')
 middle_df = pd.read_csv(csv_path)
 
 class QueueCallbackHandler(BaseCallbackHandler):
@@ -90,13 +90,6 @@ def get_profile_image_path(username):
         image_path = os.path.join(profile_images_folder, "default.jpg")
     return image_path
 
-def truncate_context(context: str, max_tokens: int = 1000) -> str:
-    tokenizer = tiktoken.get_encoding("cl100k_base")
-    tokens = tokenizer.encode(context)
-    if len(tokens) > max_tokens:
-        tokens = tokens[:max_tokens]
-    return tokenizer.decode(tokens)
-
 class CustomRetriever(BaseRetriever):
     documents: List[Document] = Field(default_factory=list)
     max_tokens: int = 1000 # maximum tokens for context
@@ -107,24 +100,29 @@ class CustomRetriever(BaseRetriever):
         self.max_tokens = max_tokens
 
     def get_relevant_documents(self, query: str, *, run_manager: CallbackManagerForRetrieverRun = None) -> List[Document]:
-        return self._truncate_documents(self.documents)
+        # return self._truncate_documents(self.documents)
+        return self.documents
 
-    def _truncate_documents(self, documents: List[Document]) -> List[Document]:
-        total_tokens = 0
-        truncated_documents = []
-        tokenizer = tiktoken.get_encoding("cl100k_base")
+    # def _truncate_documents(self, documents: List[Document]) -> List[Document]:
+    #     total_tokens = 0
+    #     truncated_documents = []
+    #     tokenizer = tiktoken.get_encoding("cl100k_base")
 
-        for doc in documents:
-            doc_tokens = len(tokenizer.encode(doc.page_content))
-            if total_tokens + doc_tokens <= self.max_tokens:
-                truncated_documents.append(doc)
-                total_tokens += doc_tokens
-            else:
-                truncated_content = tokenizer.decode(tokenizer.encode(doc.page_content)[:self.max_tokens - total_tokens])
-                truncated_documents.append(Document(page_content=truncated_content))
-                break
-        
-        return truncated_documents
+    #     for doc in documents:
+    #         doc_tokens = len(tokenizer.encode(doc.page_content))
+    #         if total_tokens + doc_tokens <= self.max_tokens:
+    #             truncated_documents.append(doc)
+    #             total_tokens += doc_tokens
+    #         else:
+    #             truncated_content = tokenizer.decode(tokenizer.encode(doc.page_content)[:self.max_tokens - total_tokens])
+    #             truncated_doc = Document(
+    #                 page_content=truncated_content,
+    #                 metadata=doc.metadata
+    #             )
+    #             truncated_documents.append(truncated_doc)
+    #             break
+
+    #     return truncated_documents
 
 def store_query_data(query, response, session_id, ip_address):
     timestamp = pd.Timestamp.now()
@@ -177,6 +175,16 @@ def store_clear_history_signal(session_id, ip_address):
 
 
 def get_history(session_id, mode, limit=3):
+    def truncate_text(text: str, max_tokens: int) -> str:
+        if not isinstance(text, str):
+            text = str(text)
+        tokenizer = tiktoken.get_encoding("cl100k_base")
+        tokens = tokenizer.encode(text)
+        if len(tokens) > max_tokens:
+            tokens = tokens[:max_tokens]
+        return tokenizer.decode(tokens)
+
+
     if not os.path.exists(record_path):
         return ""
     
@@ -191,7 +199,9 @@ def get_history(session_id, mode, limit=3):
             break
         if session_records.iloc[i]['mode'] != mode:
             break
-        history.append(f"user query: {session_records.iloc[i]['query']}\nsystem response: {session_records.iloc[i]['response']}\n")
+        truncate_query = truncate_text(session_records.iloc[i]['query'], 300)
+        truncated_response = truncate_text(session_records.iloc[i]['response'], 300)
+        history.append(f"user query: {truncate_query}\nsystem response: {truncated_response}\n")
         count += 1
         if count >= limit:
             break
@@ -203,7 +213,8 @@ def get_history(session_id, mode, limit=3):
 def get_query_result_gpt4o_stream(query, temperature=0.7, mode=None):
     session_id = session.get('session_id')
     history = get_history(session_id, mode, limit=3)
-    print(f"Previous conversation: {history}")
+    # print(f"Previous conversation: {history}")
+    log_to_file(f"Previous conversation: {history}")
     query = f"{history}Question: {query}"
 
     openai_response = client.chat.completions.create(
@@ -223,12 +234,36 @@ def get_query_result_gpt4o_stream(query, temperature=0.7, mode=None):
     ip_address = request.remote_addr
     store_query_data(query, response_text, session_id, ip_address, mode, 'N/A')
 
+def truncate_documents(documents: List[Document], max_tokens: int) -> List[Document]:
+    total_tokens = 0
+    truncated_documents = []
+    tokenizer = tiktoken.get_encoding("cl100k_base")
+
+    for doc in documents:
+        doc_tokens = len(tokenizer.encode(doc.page_content))
+        if total_tokens + doc_tokens <= max_tokens:
+            truncated_documents.append(doc)
+            total_tokens += doc_tokens
+        else:
+            truncated_content = tokenizer.decode(tokenizer.encode(doc.page_content)[:max_tokens - total_tokens])
+            truncated_doc = Document(
+                page_content=truncated_content,
+                metadata=doc.metadata
+            )
+            truncated_documents.append(truncated_doc)
+            break
+
+    return truncated_documents
+def log_to_file(log_message):
+    with open(log_path, "a") as log_file:
+        log_file.write(log_message + "\n")
 def get_query_result_rag_stream(query, search_mode='relevance', temperature=0.7, return_source=False, mode=None):
-    
+    original_query = query
     session_id = session.get('session_id')
     history = get_history(session_id, mode, limit=3)
-    print(f"History: {history}")
-    query = f"{history}Question: {query}"
+    # print(f"History: {history}")
+
+    combined_query = f"{history}Question: {original_query}"
     
     embeddings = OpenAIEmbeddings(openai_api_key=os.environ.get('OPENAI_API_KEY'), model='text-embedding-ada-002', chunk_size=100)
     store = Chroma(persist_directory=persist_directory, embedding_function=embeddings)
@@ -255,11 +290,12 @@ def get_query_result_rag_stream(query, search_mode='relevance', temperature=0.7,
     )
 
     if search_mode == 'relevance':
-        docs = store.search(query, search_type="mmr", k=3)
-        print("Documents retrieved:", docs)  # Print the retrieved documents
-        retriever = CustomRetriever(documents=docs)
+        docs = store.search(original_query, search_type="mmr", k=3)
+        log_to_file("Documents retrieved:" + str(docs))  # Print the retrieved documents
+        truncated_docs = truncate_documents(docs, max_tokens=1000)
+        retriever = CustomRetriever(documents=truncated_docs)
     else:
-        docs = store.search(query, search_type="mmr", k=10)
+        docs = store.search(original_query, search_type="mmr", k=10)
         if search_mode == 'votes':
             for doc in docs:
                 doc.metadata['votes'] = get_kernel_vote(doc.metadata['title'])
@@ -268,8 +304,13 @@ def get_query_result_rag_stream(query, search_mode='relevance', temperature=0.7,
             for doc in docs:
                 doc.metadata['views'] = get_kernel_view(doc.metadata['title'])
             docs = sorted(docs, key=lambda x: x.metadata.get('views', 0), reverse=True)[:3]
-
-        retriever = CustomRetriever(documents=docs)
+        truncated_docs = truncate_documents(docs, max_tokens=1000)
+        retriever = CustomRetriever(documents=truncated_docs)
+        # retriever = CustomRetriever(documents=docs)
+    # truncated_docs = truncate_documents(docs, max_tokens=1000)
+    source_documents_json = documents_to_json(truncated_docs)
+    # source_documents_json = documents_to_json(docs)
+    log_to_file("Source documents:" + str(source_documents_json))
     llm_chain = RetrievalQA.from_chain_type(
         llm=llm,
         chain_type="stuff",
@@ -279,20 +320,21 @@ def get_query_result_rag_stream(query, search_mode='relevance', temperature=0.7,
     )
 
 
-    def stream_callback(query):
+    def stream_callback(combined_query):
         finished = object()
         response_text = ""
 
         def task():
             nonlocal response_text
             try:
-                result = llm_chain.invoke(query)
-                print(f"Result source documents: {result['source_documents']}")
+                result = llm_chain.invoke(combined_query)
+                # print(f"Result source documents: {result['source_documents']}")
                 source_documents_holder[0] = documents_to_json(result['source_documents'])
                 response_text = result['result']
                 output_queue.put(finished)
             except Exception as e:
                 print(f"LLM chain error: {e}")
+                log_to_file(f"LLM chain error: {e}")
                 output_queue.put("\nInternal Server Error\n")
                 output_queue.put(finished)
 
@@ -308,15 +350,15 @@ def get_query_result_rag_stream(query, search_mode='relevance', temperature=0.7,
             except Queue.Empty:
                 continue
         if return_source:
-            yield f"Source: {source_documents_holder[0]}$EOL"
+            yield f"Source: {source_documents_json}$EOL"
         
         # session_id = session.get('session_id')
         ip_address = request.remote_addr
-        store_query_data(query, response_text, session_id, ip_address, mode, search_mode)
+        store_query_data(original_query, response_text, session_id, ip_address, mode, search_mode)
 
 
     def stream_generator():
-        for res_dict in stream_callback(query):
+        for res_dict in stream_callback(combined_query):
             yield res_dict
     
     yield from stream_generator()

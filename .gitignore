@@ -2,6 +2,7 @@
 
 # data
 /data
+/docker_image
 /record
 /venv
 /tmp
