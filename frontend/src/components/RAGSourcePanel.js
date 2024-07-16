@@ -27,10 +27,13 @@ const RAGSourcePanel = ({ doc }) => {
             `/get_username?kernel_id=${doc.metadata.title}`,
             `/get_kernel_vote?kernel_id=${doc.metadata.title}`,
             `/get_kernel_view?kernel_id=${doc.metadata.title}`,
-            `/get_kernel_url?kernel_id=${doc.metadata.title}`
+            `/get_kernel_url?kernel_id=${doc.metadata.title}`,
+            `/get_kernel_comment?kernel_id=${doc.metadata.title}`,
+            `/get_kernel_title?kernel_id=${doc.metadata.title}`,
+            `/get_kernel_date?kernel_id=${doc.metadata.title}`
         ];
         try {
-            const [responseUsername, responseVotes, responseViews, responseURL] = await Promise.all(
+            const [responseUsername, responseVotes, responseViews, responseURL,responseComment,responseTitle,responseDate] = await Promise.all(
                 endpoints.map(endpoint => fetchData(endpoint))
             );
             const responseProfileImage = await fetchData(`/get_profile_image_path?username=${responseUsername}`)
@@ -39,10 +42,9 @@ const RAGSourcePanel = ({ doc }) => {
                 votes: responseVotes,
                 views: responseViews,
                 url: responseURL.url,
-                score: 0.57,
-                comment: 20,
-                title: 'Moa | Feature Selection | Cp_dose | Cp_time',
-                update:'4y ago',
+                comment: responseComment,
+                title: responseTitle,
+                update: responseDate,
                 profileImage: `/static/profile_images_10737/${responseProfileImage}`
             }
             setSourceMeta(result)
@@ -77,7 +79,7 @@ const RAGSourcePanel = ({ doc }) => {
                     <div className="source-document-info">
                         <p><strong>{sourceMeta.title}</strong></p>
                         <p className='source-secondary'>Author: {sourceMeta.username} · {sourceMeta.update}</p>
-                        <p className='source-secondary'>Score: {sourceMeta.score} · {sourceMeta.comment} comments</p>
+                        <p className='source-secondary'>{sourceMeta.comment} comments</p>
                     </div>
                     <ul className="source-document-status">
                         <li> <FontAwesomeIcon icon={faEye} /> {sourceMeta.views}</li>
