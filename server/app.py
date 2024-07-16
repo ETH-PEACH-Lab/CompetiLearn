@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify, send_from_directory, stream_with_cont
 from flask_cors import CORS
 from flask_caching import Cache
 from query_module import (
-    get_username, get_kernel_vote, get_kernel_view,
+    get_username, get_kernel_vote, get_kernel_view,get_kernel_comment,get_kernel_title,get_kernel_date,
     get_profile_image_path, 
     get_query_result_gpt4o_stream, 
     get_query_result_rag_stream, store_clear_history_signal
@@ -78,6 +78,27 @@ def get_kernel_view_endpoint():
     views = get_kernel_view(kernel_id)
     return jsonify(views)
 
+@app.route('/get_kernel_comment', methods=['GET'])
+@cache.cached(timeout=300, query_string=True)
+def get_kernel_comment_endpoint():
+    kernel_id = request.args.get('kernel_id')
+    comment = get_kernel_comment(kernel_id)
+    return jsonify(comment)
+
+@app.route('/get_kernel_title', methods=['GET'])
+@cache.cached(timeout=300, query_string=True)
+def get_kernel_title_endpoint():
+    kernel_id = request.args.get('kernel_id')
+    title = get_kernel_title(kernel_id)
+    return jsonify(title)
+
+@app.route('/get_kernel_date', methods=['GET'])
+@cache.cached(timeout=300, query_string=True)
+def get_kernel_date_endpoint():
+    kernel_id = request.args.get('kernel_id')
+    date = get_kernel_date(kernel_id)
+    return jsonify(date)
+
 @app.route('/get_profile_image_path', methods=['GET'])
 @cache.cached(timeout=300, query_string=True)
 def get_profile_image_path_endpoint():
@@ -92,33 +113,33 @@ def document_to_dict(doc):
         'metadata': doc.metadata
     }
 
-@app.route('/search', methods=['POST'])
-def search():
-    data = request.json
-    query = data.get('query', '')
-    mode = data.get('mode', 'rag_with_link')
-    temperature = data.get('temperature', 0.7)
-    search_mode = data.get('search_mode', 'relevance')
-    print(f'Received search query: {query}, mode: {mode}, search_mode: {search_mode}, temperature: {temperature}')
+# @app.route('/search', methods=['POST'])
+# def search():
+#     data = request.json
+#     query = data.get('query', '')
+#     mode = data.get('mode', 'rag_with_link')
+#     temperature = data.get('temperature', 0.7)
+#     search_mode = data.get('search_mode', 'relevance')
+#     print(f'Received search query: {query}, mode: {mode}, search_mode: {search_mode}, temperature: {temperature}')
     
-    if mode == 'rag_with_link':
-        result = get_query_result_with_modes(query, search_mode, temperature)
-    elif mode == 'rag_without_link':
-        result = get_query_result_no_link(query, temperature)
-    elif mode == 'gpt4o':
-        result = get_query_result_gpt4o(query, temperature)
-    else:
-        return jsonify({'error': 'Invalid mode specified'}), 400
+#     if mode == 'rag_with_link':
+#         result = get_query_result_with_modes(query, search_mode, temperature)
+#     elif mode == 'rag_without_link':
+#         result = get_query_result_no_link(query, temperature)
+#     elif mode == 'gpt4o':
+#         result = get_query_result_gpt4o(query, temperature)
+#     else:
+#         return jsonify({'error': 'Invalid mode specified'}), 400
     
-    result_serializable = {
-        'query': result.get('query', ''),
-        'result': result.get('result', ''),
-        'source_documents': [document_to_dict(doc) for doc in result.get('source_documents', [])]
-    }
+#     result_serializable = {
+#         'query': result.get('query', ''),
+#         'result': result.get('result', ''),
+#         'source_documents': [document_to_dict(doc) for doc in result.get('source_documents', [])]
+#     }
     
-    print(result_serializable)
+#     print(result_serializable)
     
-    return jsonify(result_serializable)
+#     return jsonify(result_serializable)
 
 @app.route('/stream', methods=['POST'])
 def stream():

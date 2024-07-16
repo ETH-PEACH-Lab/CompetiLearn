@@ -13,7 +13,7 @@ const AdvancedSearchPanel = ({ temperature, onTemperatureChange, searchMode, onS
     return (
         <div className="advanced-search-panel">
             <h3>Advanced Search Options</h3>
-            <div className="slider-container">
+            {/* <div className="slider-container">
                 <label>Temperature: {temperature}</label>
                 <input
                     type="range"
@@ -23,12 +23,13 @@ const AdvancedSearchPanel = ({ temperature, onTemperatureChange, searchMode, onS
                     value={temperature}
                     onChange={handleSliderChange}
                 />
-            </div>
+            </div> */}
             <div className="mode-container">
                 <label>Order By:</label>
                 <select value={searchMode} onChange={handleModeChange}>
-                    <option value="relevance">Relevance</option>
                     <option value="votes">Votes</option>
+                    <option value="relevance">Relevance</option>
+
                     <option value="views">Views</option>
                 </select>
             </div>

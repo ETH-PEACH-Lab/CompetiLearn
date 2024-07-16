@@ -16,7 +16,7 @@ function App() {
     const [activeButton, setActiveButton] = useState('rag_with_link');
     const [isAdvancedSearchOpen, setIsAdvancedSearchOpen] = useState(false);
     const [temperature, setTemperature] = useState(0.7);  // Default temperature
-    const [searchMode, setSearchMode] = useState('relevance');  // Default search mode
+    const [searchMode, setSearchMode] = useState('votes');  // Default search mode
 
     useEffect(() => {
         localStorage.removeItem('chatHistory');

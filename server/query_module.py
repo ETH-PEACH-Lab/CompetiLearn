@@ -21,6 +21,7 @@ import sys
 from pydantic import Field
 import tiktoken
 from flask import request, session
+from datetime import datetime
 
 client = OpenAI(
     api_key=os.environ.get('OPENAI_API_KEY'),
@@ -55,6 +56,16 @@ class QueueCallbackHandler(BaseCallbackHandler):
         self.enter_answer_phase = not self.enter_answer_phase
         return True
 
+
+def get_kernel_score(kernel_version_id0):
+    kernel_version_id = int(kernel_version_id0)
+    result = middle_df.loc[middle_df['CurrentKernelVersionId'] == kernel_version_id, ['TotalVotes']]
+    if not result.empty:
+        user_info = result.iloc[0].to_dict()
+        return user_info['TotalVotes']
+    else:
+        return 0
+
 def get_kernel_vote(kernel_version_id0):
     kernel_version_id = int(kernel_version_id0)
     result = middle_df.loc[middle_df['CurrentKernelVersionId'] == kernel_version_id, ['TotalVotes']]
@@ -82,6 +93,51 @@ def get_username(kernel_version_id0):
     else:
         return "default"
 
+def get_kernel_comment(kernel_version_id0):
+    kernel_version_id = int(kernel_version_id0)
+    result = middle_df.loc[middle_df['CurrentKernelVersionId'] == kernel_version_id, ['TotalComments']]
+    if not result.empty:
+        user_info = result.iloc[0].to_dict()
+        return user_info['TotalComments']
+    else:
+        return "default"
+    
+def get_kernel_title(kernel_version_id0):
+    kernel_version_id = int(kernel_version_id0)
+    result = middle_df.loc[middle_df['CurrentKernelVersionId'] == kernel_version_id, ['Title']]
+    if not result.empty:
+        user_info = result.iloc[0].to_dict()
+        return user_info['Title']
+    else:
+        return "default"
+def get_date_difference(made_public_date_str):
+    made_public_date = datetime.strptime(made_public_date_str, '%m/%d/%Y')
+    current_date = datetime.now()
+    difference = current_date - made_public_date
+    
+    days = difference.days
+    weeks = days // 7
+    months = days // 30
+    years = days // 365
+    
+    if days < 7:
+        return f"{days}d ago"
+    elif days < 30:
+        return f"{weeks} weeks ago"
+    elif days < 365:
+        return f"{months}m ago"
+    else:
+        return f"{years}y ago"
+
+def get_kernel_date(kernel_version_id0):
+    kernel_version_id = int(kernel_version_id0)
+    result = middle_df.loc[middle_df['CurrentKernelVersionId'] == kernel_version_id, ['MadePublicDate']]
+    
+    if not result.empty:
+        made_public_date_str = result.iloc[0]['MadePublicDate']
+        return get_date_difference(made_public_date_str)
+    else:
+        return "default"
 def get_profile_image_path(username):
     # profile_images_dir = '/app/data/profile_images_10737'
     # profile_images_dir = '../../profile_images_19988'
