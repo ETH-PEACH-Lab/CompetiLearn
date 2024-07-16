@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import Markdown from 'react-markdown';
 import RAGSourcePanel from './RAGSourcePanel';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -9,18 +9,18 @@ import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism'
 
 
 const ResultDisplay = ({ results }) => {
-    const queryBubbleRefs = useRef([]);
+    // const queryBubbleRefs = useRef([]);
 
-    useEffect(() => {
-        if (queryBubbleRefs.current.length > 0) {
-            const lastBubble = queryBubbleRefs.current[queryBubbleRefs.current.length - 1];
-            if (lastBubble) {
-                setTimeout(() => {
-                    lastBubble.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }, 100); // Add a slight delay to ensure the DOM is fully updated
-            }
-        }
-    }, [results]);
+    // useEffect(() => {
+    //     if (queryBubbleRefs.current.length > 0) {
+    //         const lastBubble = queryBubbleRefs.current[queryBubbleRefs.current.length - 1];
+    //         if (lastBubble) {
+    //             setTimeout(() => {
+    //                 lastBubble.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    //             }, 100); // Add a slight delay to ensure the DOM is fully updated
+    //         }
+    //     }
+    // }, [results]);
 
     return (
         <div className="result-display">
@@ -29,14 +29,14 @@ const ResultDisplay = ({ results }) => {
                     <div key={resultIndex}>
                         <div
                             className="chat-bubble user-bubble"
-                            ref={(el) => {
-                                queryBubbleRefs.current[resultIndex] = el;
-                                if (resultIndex === results.length - 1 && el) {
-                                    setTimeout(() => {
-                                        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                                    }, 100); // Add a slight delay to ensure the DOM is fully updated
-                                }
-                            }}
+                            // ref={(el) => {
+                            //     queryBubbleRefs.current[resultIndex] = el;
+                            //     if (resultIndex === results.length - 1 && el) {
+                            //         setTimeout(() => {
+                            //             el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            //         }, 100); // Add a slight delay to ensure the DOM is fully updated
+                            //     }
+                            // }}
                         >
                             <div className="chat-user">
                                 <FontAwesomeIcon icon={faUser} />

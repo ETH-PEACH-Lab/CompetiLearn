@@ -9,6 +9,7 @@ services:
       - "5001:5001"
     volumes:
       - ./data:/app/data
+      - ./record:/app/record
     environment:
       - FLASK_ENV=development
     env_file:

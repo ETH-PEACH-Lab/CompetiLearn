@@ -8,7 +8,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { faGear } from '@fortawesome/free-solid-svg-icons';
 import { Tooltip } from 'react-tooltip'
-
+import Container from 'react-bootstrap/esm/Container';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 
 function App() {
@@ -133,27 +134,8 @@ function App() {
     };
     return (
         <div className="App">
-            <Header />
-            <div className="button-group">
-                <button
-                    className={`mode-button ${activeButton === 'rag_with_link' ? 'active' : ''}`}
-                    onClick={() => handleButtonClick('rag_with_link')}
-                >
-                    Alice
-                </button>
-                <button
-                    className={`mode-button ${activeButton === 'rag_without_link' ? 'active' : ''}`}
-                    onClick={() => handleButtonClick('rag_without_link')}
-                >
-                    Bob
-                </button>
-                <button
-                    className={`mode-button ${activeButton === 'gpt4o' ? 'active' : ''}`}
-                    onClick={() => handleButtonClick('gpt4o')}
-                >
-                    Charlie
-                </button>
-            </div>
+            <Header handleButtonClickCallback={handleButtonClick}/>
+            <Container>
             <ResultDisplay results={results} />
             <div className="search-bar-container">
                 <button className="secondary-button" onClick={handleNewChat}>
@@ -180,6 +162,7 @@ function App() {
                     onNumSourceDocsChange={handleNumSourceDocsChange}
                 />
             )}
+            </Container>
         </div>
     );
 }
