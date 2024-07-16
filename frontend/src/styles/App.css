@@ -27,7 +27,7 @@ body{
   height: 20px;
   border-width: 0;
   overflow-y: hidden;
-  padding: 2rem 0rem;
+  padding: 1rem 0rem;
   width: 100%;
   height: 100%;
   font-size: 15px;
@@ -180,8 +180,7 @@ button {
 }
 
 .result-display li {
-  border-bottom: 1px solid #eee;
-  padding: 10px 0;
+  padding: 4px 0;
 }
 
 /* .result-display li:last-child {
@@ -196,7 +195,6 @@ button {
 }
 
 .result-display .chat-content > pre {
-  background: #1e1e1e;
   padding: 10px;
   border-radius: 4px;
   overflow: auto;

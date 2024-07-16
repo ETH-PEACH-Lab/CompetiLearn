@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
 import { faRobot } from '@fortawesome/free-solid-svg-icons';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
-import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism'
+import { oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism'
 
 
 const ResultDisplay = ({ results }) => {
@@ -54,7 +54,7 @@ const ResultDisplay = ({ results }) => {
                                                     PreTag="div"
                                                     children={String(children).replace(/\n$/, '')}
                                                     language={match[1]}
-                                                    style={vscDarkPlus}
+                                                    style={oneLight}
                                                 />
                                             ) : (
                                                 <code {...rest} className={className}>
@@ -85,7 +85,7 @@ const ResultDisplay = ({ results }) => {
                                                     PreTag="div"
                                                     children={String(children).replace(/\n$/, '')}
                                                     language={match[1]}
-                                                    style={vscDarkPlus}
+                                                    style={oneLight}
                                                 />
                                             ) : (
                                                 <code {...rest} className={className}>
