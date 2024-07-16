@@ -174,11 +174,6 @@ button {
   margin-top: 0;
 }
 
-.result-display ul {
-  list-style-type: none;
-  padding: 0;
-}
-
 .result-display li {
   padding: 4px 0;
 }
@@ -321,7 +316,7 @@ button {
 }
 
 .chat-content > :first-child{
-  margin-top: 5px;
+  margin-top: 12px;
 }
 
 /* New styles for profile image and source document info */
