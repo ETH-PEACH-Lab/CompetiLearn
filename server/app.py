@@ -148,16 +148,17 @@ def stream():
     mode = data.get('mode', 'rag_with_link')
     temperature = data.get('temperature', 0.7)
     search_mode = data.get('search_mode', 'relevance')
-    print(f'Received stream query: {query}, mode: {mode}, search_mode: {search_mode}, temperature: {temperature}')
+    num_source_docs = data.get('num_source_docs', 3)  # New parameter
+    print(f'Received stream query: {query}, mode: {mode}, search_mode: {search_mode}, temperature: {temperature}, num_source_docs: {num_source_docs}')
     # Ensure session ID exists
     if 'session_id' not in session:
         session['session_id'] = os.urandom(24).hex()
         
     if mode == 'rag_with_link':
-        result = Response(stream_with_context(get_query_result_rag_stream(query, search_mode, temperature, return_source=True,mode=mode)), content_type='text/event-strean')
+        result = Response(stream_with_context(get_query_result_rag_stream(query, search_mode, temperature, return_source=True,mode=mode, num_source_docs=num_source_docs)), content_type='text/event-strean')
         print('result:', result)    
     elif mode == 'rag_without_link':
-        result = Response(stream_with_context(get_query_result_rag_stream(query, search_mode, temperature, return_source=False,mode=mode)), content_type='text/event-stream')
+        result = Response(stream_with_context(get_query_result_rag_stream(query, search_mode, temperature, return_source=False,mode=mode, num_source_docs=num_source_docs)), content_type='text/event-stream')
         print('result:', result)
     elif mode == 'gpt4o':
         result = Response(stream_with_context(get_query_result_gpt4o_stream(query, temperature,mode=mode)), content_type='text/event-stream')

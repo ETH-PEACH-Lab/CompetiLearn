@@ -180,21 +180,8 @@ class CustomRetriever(BaseRetriever):
 
     #     return truncated_documents
 
-def store_query_data(query, response, session_id, ip_address):
-    timestamp = pd.Timestamp.now()
-    data = {
-        'timestamp': [timestamp],
-        'session_id': [session_id],
-        'ip_address': [ip_address],
-        'query': [query],
-        'response': [response]
-    }
-    df = pd.DataFrame(data)
-    if not os.path.exists(record_path):
-        df.to_csv(record_path, index=False)
-    else:
-        df.to_csv(record_path, mode='a', header=False, index=False)
-def store_query_data(query, response, session_id, ip_address, mode, search_mode):
+
+def store_query_data(query, response, session_id, ip_address, mode, search_mode,num_source_docs):
     timestamp = pd.Timestamp.now()
     data = {
         'timestamp': [timestamp],
@@ -202,6 +189,7 @@ def store_query_data(query, response, session_id, ip_address, mode, search_mode)
         'ip_address': [ip_address],
         'mode': [mode],
         'search_mode': [search_mode],
+        'num_source_docs': [num_source_docs],
         'query': [query],
         'response': [response]
         
@@ -288,7 +276,7 @@ def get_query_result_gpt4o_stream(query, temperature=0.7, mode=None):
             yield f"Result: {text}$EOL"
     
     ip_address = request.remote_addr
-    store_query_data(query, response_text, session_id, ip_address, mode, 'N/A')
+    store_query_data(query, response_text, session_id, ip_address, mode, 'N/A','N/A')
 
 def truncate_documents(documents: List[Document], max_tokens: int) -> List[Document]:
     total_tokens = 0
@@ -313,7 +301,7 @@ def truncate_documents(documents: List[Document], max_tokens: int) -> List[Docum
 def log_to_file(log_message):
     with open(log_path, "a") as log_file:
         log_file.write(log_message + "\n")
-def get_query_result_rag_stream(query, search_mode='relevance', temperature=0.7, return_source=False, mode=None):
+def get_query_result_rag_stream(query, search_mode='relevance', temperature=0.7, return_source=False, mode=None,num_source_docs=3):
     original_query = query
     session_id = session.get('session_id')
     history = get_history(session_id, mode, limit=3)
@@ -346,7 +334,7 @@ def get_query_result_rag_stream(query, search_mode='relevance', temperature=0.7,
     )
 
     if search_mode == 'relevance':
-        docs = store.search(original_query, search_type="mmr", k=3)
+        docs = store.search(original_query, search_type="mmr", k=num_source_docs)
         log_to_file("Documents retrieved:" + str(docs))  # Print the retrieved documents
         truncated_docs = truncate_documents(docs, max_tokens=1000)
         retriever = CustomRetriever(documents=truncated_docs)
@@ -355,11 +343,11 @@ def get_query_result_rag_stream(query, search_mode='relevance', temperature=0.7,
         if search_mode == 'votes':
             for doc in docs:
                 doc.metadata['votes'] = get_kernel_vote(doc.metadata['title'])
-            docs = sorted(docs, key=lambda x: x.metadata.get('votes', 0), reverse=True)[:3]
+            docs = sorted(docs, key=lambda x: x.metadata.get('votes', 0), reverse=True)[:num_source_docs]
         elif search_mode == 'views':
             for doc in docs:
                 doc.metadata['views'] = get_kernel_view(doc.metadata['title'])
-            docs = sorted(docs, key=lambda x: x.metadata.get('views', 0), reverse=True)[:3]
+            docs = sorted(docs, key=lambda x: x.metadata.get('views', 0), reverse=True)[:num_source_docs]
         truncated_docs = truncate_documents(docs, max_tokens=1000)
         retriever = CustomRetriever(documents=truncated_docs)
         # retriever = CustomRetriever(documents=docs)
@@ -410,7 +398,7 @@ def get_query_result_rag_stream(query, search_mode='relevance', temperature=0.7,
         
         # session_id = session.get('session_id')
         ip_address = request.remote_addr
-        store_query_data(original_query, response_text, session_id, ip_address, mode, search_mode)
+        store_query_data(original_query, response_text, session_id, ip_address, mode, search_mode,num_source_docs)
 
 
     def stream_generator():

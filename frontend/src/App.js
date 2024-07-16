@@ -17,6 +17,7 @@ function App() {
     const [isAdvancedSearchOpen, setIsAdvancedSearchOpen] = useState(false);
     const [temperature, setTemperature] = useState(0.7);  // Default temperature
     const [searchMode, setSearchMode] = useState('votes');  // Default search mode
+    const [numSourceDocs, setNumSourceDocs] = useState(3);  // Default number of source documents
 
     useEffect(() => {
         localStorage.removeItem('chatHistory');
@@ -33,7 +34,7 @@ function App() {
         const newResult = { query, response: '', mode, source_documents: [] };
         setResults(prevResults => [...prevResults, newResult]);
 
-        fetchStreamData('/stream', { query, mode, temperature, search_mode: searchMode })
+        fetchStreamData('/stream', { query, mode, temperature, search_mode: searchMode, num_source_docs: numSourceDocs })
     };
 
     const fetchStreamData = async (url, data) => {
@@ -126,7 +127,10 @@ function App() {
     const handleSearchModeChange = (value) => {
         setSearchMode(value);
     };
-
+    
+    const handleNumSourceDocsChange = (value) => {
+        setNumSourceDocs(value);
+    };
     return (
         <div className="App">
             <Header />
@@ -172,6 +176,8 @@ function App() {
                     onTemperatureChange={handleTemperatureChange}
                     searchMode={searchMode}
                     onSearchModeChange={handleSearchModeChange}
+                    numSourceDocs={numSourceDocs}
+                    onNumSourceDocsChange={handleNumSourceDocsChange}
                 />
             )}
         </div>
