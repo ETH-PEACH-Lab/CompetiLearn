@@ -17,7 +17,7 @@ function App() {
     const [activeButton, setActiveButton] = useState('rag_with_link');
     const [isAdvancedSearchOpen, setIsAdvancedSearchOpen] = useState(false);
     const [temperature, setTemperature] = useState(0.7);  // Default temperature
-    const [searchMode, setSearchMode] = useState('votes');  // Default search mode
+    const [searchMode, setSearchMode] = useState('relevance');  // Default search mode
     const [numSourceDocs, setNumSourceDocs] = useState(3);  // Default number of source documents
 
     useEffect(() => {
@@ -145,14 +145,17 @@ function App() {
                     </a>
                 </button>
                 <SearchBar onSearch={(query) => handleSearch(query, activeButton)} />
-                <button className="secondary-button" onClick={toggleAdvancedSearch}>
-                <Tooltip id="my-tooltip-advanced" />
-                <a data-tooltip-id="my-tooltip-advanced" data-tooltip-content="Advanced Search Options">
-                <FontAwesomeIcon icon={faGear}/>
-                </a>
-                </button>
+                {activeButton === 'rag_with_link' && (
+                    <button className="secondary-button" onClick={toggleAdvancedSearch}>
+                    <Tooltip id="my-tooltip-advanced" />
+                    <a data-tooltip-id="my-tooltip-advanced" data-tooltip-content="Advanced Search Options">
+                    <FontAwesomeIcon icon={faGear}/>
+                    </a>
+                    </button>
+                )}
+
             </div>
-            {isAdvancedSearchOpen && (
+            {isAdvancedSearchOpen && activeButton === 'rag_with_link' &&(
                 <AdvancedSearchPanel
                     temperature={temperature}
                     onTemperatureChange={handleTemperatureChange}

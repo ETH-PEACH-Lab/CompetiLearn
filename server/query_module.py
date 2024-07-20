@@ -259,7 +259,9 @@ def get_query_result_gpt4o_stream(query, temperature=0.7, mode=None):
     history = get_history(session_id, mode, limit=3)
     # print(f"Previous conversation: {history}")
     log_to_file(f"Previous conversation: {history}")
-    query = f"{history}Question: {query}"
+    pre_query = """Task: You are an expert in data science. Please answer questions about a Kaggle competition: "Quora Insincere Questions Classification" to help the user deal with his/her task, answer with code is preferable. \n
+    Competition description: In this competition, Kagglers will develop models that identify and flag insincere questions. To date, Quora has employed both machine learning and manual review to address this problem. With your help, they can develop more scalable methods to detect toxic and misleading content.\n"""
+    query = f"{pre_query}{history}Question: {query}"
 
     openai_response = client.chat.completions.create(
         model="gpt-4o",
@@ -302,6 +304,10 @@ def log_to_file(log_message):
     with open(log_path, "a") as log_file:
         log_file.write(log_message + "\n")
 def get_query_result_rag_stream(query, search_mode='relevance', temperature=0.7, return_source=False, mode=None,num_source_docs=3):
+    if mode == 'rag_without_link':
+        search_mode = 'relevance'
+        num_source_docs = 3
+        print(f"num_source_docs: {num_source_docs}")
     original_query = query
     session_id = session.get('session_id')
     history = get_history(session_id, mode, limit=3)
