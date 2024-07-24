@@ -22,6 +22,8 @@ from pydantic import Field
 import tiktoken
 from flask import request, session
 from datetime import datetime
+import fcntl
+
 
 client = OpenAI(
     api_key=os.environ.get('OPENAI_API_KEY'),
@@ -38,7 +40,16 @@ persist_directory = os.path.abspath(os.path.join(current_dir, '../data/ChromDB/1
 profile_images_folder = os.path.join(current_dir, '../data/profile_images_10737')
 record_path = os.path.join(current_dir, '../record/record.csv')
 log_path = os.path.join(current_dir, '../record/log.txt')
-middle_df = pd.read_csv(csv_path)
+
+def read_csv_with_lock(path):
+    with open(path, 'r') as file:
+        fcntl.flock(file, fcntl.LOCK_SH)
+        df = pd.read_csv(file)
+        fcntl.flock(file, fcntl.LOCK_UN)
+    return df
+
+middle_df = read_csv_with_lock(csv_path)
+# middle_df = pd.read_csv(csv_path)
 
 class QueueCallbackHandler(BaseCallbackHandler):
     """A queue that holds the result answer token buffer for streaming response."""
@@ -181,7 +192,8 @@ class CustomRetriever(BaseRetriever):
     #     return truncated_documents
 
 
-def store_query_data(query, response, session_id, ip_address, mode, search_mode,num_source_docs):
+
+def store_query_data(query, response, session_id, ip_address, mode, search_mode, num_source_docs):
     timestamp = pd.Timestamp.now()
     data = {
         'timestamp': [timestamp],
@@ -192,13 +204,16 @@ def store_query_data(query, response, session_id, ip_address, mode, search_mode,
         'num_source_docs': [num_source_docs],
         'query': [query],
         'response': [response]
-        
     }
     df = pd.DataFrame(data)
-    if not os.path.exists(record_path):
-        df.to_csv(record_path, index=False)
-    else:
-        df.to_csv(record_path, mode='a', header=False, index=False)
+    with open(record_path, 'a') as file:
+        fcntl.flock(file, fcntl.LOCK_EX)
+        if not os.path.exists(record_path) or os.stat(record_path).st_size == 0:
+            df.to_csv(file, index=False)
+        else:
+            df.to_csv(file, mode='a', header=False, index=False)
+        fcntl.flock(file, fcntl.LOCK_UN)
+
 
 def store_clear_history_signal(session_id, ip_address):
     timestamp = pd.Timestamp.now()
@@ -212,10 +227,14 @@ def store_clear_history_signal(session_id, ip_address):
         'response': ['N/A']
     }
     df = pd.DataFrame(data)
-    if not os.path.exists(record_path):
-        df.to_csv(record_path, index=False)
-    else:
-        df.to_csv(record_path, mode='a', header=False, index=False)
+    with open(record_path, 'a') as file:
+        fcntl.flock(file, fcntl.LOCK_EX)
+        if not os.path.exists(record_path) or os.stat(record_path).st_size == 0:
+            df.to_csv(file, index=False)
+        else:
+            df.to_csv(file, mode='a', header=False, index=False)
+        fcntl.flock(file, fcntl.LOCK_UN)
+
 
 
 def get_history(session_id, mode, limit=3):
@@ -232,7 +251,11 @@ def get_history(session_id, mode, limit=3):
     if not os.path.exists(record_path):
         return ""
     
-    df = pd.read_csv(record_path)
+    with open(record_path, 'r') as file:
+        fcntl.flock(file, fcntl.LOCK_SH)
+        df = pd.read_csv(file)
+        fcntl.flock(file, fcntl.LOCK_UN)
+    # df = pd.read_csv(record_path)
     session_records = df[df['session_id'] == session_id].iloc[::-1]
     
     history = []
