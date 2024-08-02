@@ -38,7 +38,8 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 csv_path = os.path.abspath(os.path.join(current_dir, '../data/middle_file3.csv'))
 persist_directory = os.path.abspath(os.path.join(current_dir, '../data/ChromDB/10737_filter_revise_python'))
 profile_images_folder = os.path.join(current_dir, '../data/profile_images_10737')
-record_path = os.path.join(current_dir, '../record/record.csv')
+# session_id = session.get('session_id')
+# record_path = os.path.join(current_dir, f'../record/{session_id}.csv')
 log_path = os.path.join(current_dir, '../record/log.txt')
 
 def read_csv_with_lock(path):
@@ -206,6 +207,7 @@ def store_query_data(query, response, session_id, ip_address, mode, search_mode,
         'response': [response]
     }
     df = pd.DataFrame(data)
+    record_path = os.path.join(current_dir, f'../record/{session_id}.csv')
     with open(record_path, 'a') as file:
         fcntl.flock(file, fcntl.LOCK_EX)
         if not os.path.exists(record_path) or os.stat(record_path).st_size == 0:
@@ -227,6 +229,7 @@ def store_clear_history_signal(session_id, ip_address):
         'response': ['N/A']
     }
     df = pd.DataFrame(data)
+    record_path = os.path.join(current_dir, f'../record/{session_id}.csv')
     with open(record_path, 'a') as file:
         fcntl.flock(file, fcntl.LOCK_EX)
         if not os.path.exists(record_path) or os.stat(record_path).st_size == 0:
@@ -247,7 +250,7 @@ def get_history(session_id, mode, limit=3):
             tokens = tokens[:max_tokens]
         return tokenizer.decode(tokens)
 
-
+    record_path = os.path.join(current_dir, f'../record/{session_id}.csv')
     if not os.path.exists(record_path):
         return ""
     
@@ -282,9 +285,9 @@ def get_query_result_gpt4o_stream(query, temperature=0.7, mode=None):
     history = get_history(session_id, mode, limit=3)
     # print(f"Previous conversation: {history}")
     log_to_file(f"Previous conversation: {history}")
-    pre_query = """Task: You are an expert in data science. Please answer questions about a Kaggle competition: "Quora Insincere Questions Classification" to help the user deal with his/her task, answer with code is preferable. \n
-    Competition description: In this competition, Kagglers will develop models that identify and flag insincere questions. To date, Quora has employed both machine learning and manual review to address this problem. With your help, they can develop more scalable methods to detect toxic and misleading content.\n"""
-    query = f"{pre_query}{history}Question: {query}"
+    # pre_query = """Task: You are an expert in data science. Please answer questions about a Kaggle competition: "Quora Insincere Questions Classification" to help the user deal with his/her task, answer with code is preferable. \n
+    # Competition description: In this competition, Kagglers will develop models that identify and flag insincere questions. To date, Quora has employed both machine learning and manual review to address this problem. With your help, they can develop more scalable methods to detect toxic and misleading content.\n"""
+    query = f"{history}Question: {query}"
 
     openai_response = client.chat.completions.create(
         model="gpt-4o",

@@ -27,7 +27,7 @@ def summarize_languages_in_folder(folder_path):
     return language_counter
 
 # Example usage:
-folder_path = '/Users/junlingwang/myfiles/PHD/RAG_project/CompetiLearn/data/competition_10737_filter'
+folder_path = '/Users/junlingwang/myfiles/PHD/RAG_project/CompetiLearn/data/competition_10737_filter_python'
 language_summary = summarize_languages_in_folder(folder_path)
 
 print("Language statistics:")
