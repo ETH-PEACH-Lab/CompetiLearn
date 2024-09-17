@@ -18,7 +18,8 @@ const Header = ({ handleButtonClickCallback }) => {
         <Navbar expand="lg" className="bg-body-tertiary">
             <Container>
                 <Navbar.Brand>
-                    <h1>CompetiLearn</h1>
+                    <h1><span class="small-caps">ChatCommunity</span></h1>
+                    {/* <h1>ChatCommunity</h1> */}
                 </Navbar.Brand>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">

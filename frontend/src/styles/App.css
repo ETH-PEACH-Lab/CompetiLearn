@@ -13,7 +13,12 @@ body{
   color: rgb(9, 9, 11);
   margin: auto;
 }
-
+.small-caps {
+  font-family: "Times New Roman", Times, serif; /* Times font from ACM template */
+  font-variant: small-caps;
+  font-size: 1.2em; /* Adjust the size if needed */
+  font-weight: normal;
+}
 .App-logo {
   height: 40vmin;
   pointer-events: none;
